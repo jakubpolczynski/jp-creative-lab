@@ -1,0 +1,11 @@
+{
+  "name": "Server rack + one room (geometry fixes v1.1)",
+  "description": "Procedurally generated full 3D voxel model (not an image). Static orthographic render. Two back walls; desk and monitor against the left wall, empty right wall. External illuminated cables meet the exterior wall.",
+  "room_walls": 2,
+  "camera": "fixed isometric",
+  "interactive": false,
+  "geometry_revision": "1.1",
+  "objects": 529,
+  "vertices": 12696,
+  "triangles": 6348
+}

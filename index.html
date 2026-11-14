@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#f8f9fc"/>
+  <meta name="description" content="JP Creative Lab — prototyp prawdziwej sceny 3D: serwer rack i jedno połączone pomieszczenie voxel art."/>
+  <meta property="og:title" content="JP Creative Lab — Voxel 3D Prototype"/>
+  <meta property="og:description" content="Prawdziwy model 3D w izometrycznym stylu voxel art. Jeden serwer i jedno pomieszczenie."/>
+  <title>JP Creative Lab · 3D Voxel Prototype</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <style>
+    :root { color-scheme: light; }
+    *,*::before,*::after { box-sizing: border-box; }
+    html, body {margin:0; width:100%; height:100%; overflow:hidden; background:#f8f9fc;}
+    body { font-family:system-ui,sans-serif; }
+    .stage { position:fixed;inset:0; width:100vw; height:100dvh; background:radial-gradient(ellipse 78% 74% at 52% 49%,#ffffff 15%,#f8f9fc 100%); overflow:hidden; }
+    #scene {display:block;width:100%;height:100%;outline:none;pointer-events:none;touch-action:auto;}
+    .sr-only { position:absolute!important; width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important; }
+    .error {position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:14px/1.5 ui-monospace,monospace;text-align:center;color:#25324a;max-width:360px;padding:22px;}
+    [hidden] {display:none!important;}
+    @media (prefers-color-scheme: dark) { :root { color-scheme: light; } }
+  </style>
+</head>
+<body>
+  <main class="stage" aria-label="Statyczna scena 3D — serwer rack i połączone pomieszczenie">
+    <canvas id="scene" aria-label="Prawdziwy izometryczny model 3D: po lewej wolnostojący rack serwerowy z neonowym zielonym rdzeniem; po prawej pokój z dwiema ścianami, biurkiem i monitorem przy lewej ścianie. Kable serwera wchodzą za zewnętrzną ścianę pokoju. Nie ma aktywnych kontrolek."></canvas>
+    <p class="sr-only">Izometryczna scena 3D w stylu voxel art. Wolnostojący rack serwerowy połączony z jednym pokojem. W pokoju biurko z monitorem, klawiaturą, lampą, rośliną i krzesłem. Na ścianach nie ma napisów. Model jest celowo nieinteraktywny.</p>
+    <div id="status" class="error" role="status" aria-live="polite">Wczytywanie modelu 3D…</div>
+  </main>
+  <script type="module" src="/viewer.8286579392e8.js"></script>
+</body>
+</html>
