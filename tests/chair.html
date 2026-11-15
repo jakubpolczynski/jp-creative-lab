@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Chair animation regression</title><style>body{margin:0}iframe{border:0;width:100vw;height:90vh}pre{position:absolute;z-index:2;font-size:10px}</style></head><body><pre id="result">Testing chair…</pre><iframe title="Chair under test"></iframe><script type="module">
+try{
+ const html=await(await fetch('/')).text();
+ const setup=`<script>window.framesToRun=[];window.simTime=0;window.chairSamples=[];window.zeroChair=false;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};const names=new WeakMap(),p=WebGL2RenderingContext.prototype,get=p.getUniformLocation,uniform=p.uniform3f;p.getUniformLocation=function(program,name){const loc=get.call(this,program,name);if(loc)names.set(loc,name);return loc};p.uniform3f=function(loc,x,y,z){if(names.get(loc)==='uChairPose'){window.chairSamples.push([x,y,z]);if(window.zeroChair)x=y=z=0;}return uniform.call(this,loc,x,y,z)};<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+setup);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const w=frame.contentWindow,d=w.document,c=d.querySelector('canvas'),gl=c.getContext('webgl2');
+ function tick(time){w.simTime=time;w.framesToRun.splice(0).forEach(cb=>cb(time))}
+ function pixels(){const p=new Uint8Array(c.width*c.height*4);gl.readPixels(0,0,c.width,c.height,gl.RGBA,gl.UNSIGNED_BYTE,p);return p}
+ d.querySelector('#room-button').click();tick(500);const moved=pixels(),pose=w.chairSamples.at(-1);
+ w.zeroChair=true;w.dispatchEvent(new w.Event('resize'));const unmoved=pixels();let changed=0;for(let i=0;i<moved.length;i+=4)if(Math.max(...[0,1,2].map(j=>Math.abs(moved[i+j]-unmoved[i+j])))>5)changed++;
+ w.zeroChair=false;w.dispatchEvent(new w.Event('resize'));
+ const results=[{name:'Chair rotates left and slides to the right simultaneously',passed:pose[0]>.2&&pose[1]>.1&&pose[2]< -.3,pose},{name:'Chair motion changes actual pixels at the same camera position',passed:changed>100,changed}];
+ // Return before camera travel completes: pose must interpolate back, not jump or remain aside.
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));tick(1800);
+ const returned=w.chairSamples.at(-1);results.push({name:'Return restores chair exactly',passed:returned.every(v=>v===0),pose:returned});
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+ // Display a deterministic midpoint for visual inspection.
+ d.querySelector('#room-button').click();tick(2300);
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults);
+</script></body></html>

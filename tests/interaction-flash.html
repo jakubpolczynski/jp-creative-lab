@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Reduced-motion click flash regression</title></head><body><pre id="result">Testing…</pre><iframe width="800" height="600" title="Room"></iframe><script type="module">
+try{
+ const html=await(await fetch('/')).text();
+ const freeze=`<script>window.framesToRun=[];window.simTime=0;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};window.matchMedia=()=>({matches:true,addEventListener(){}});<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+freeze);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const win=frame.contentWindow,canvas=win.document.querySelector('canvas'),gl=canvas.getContext('webgl2');
+ if(win.document.documentElement.dataset.render!=='ready')throw Error('Scene not ready');
+ function pixels(){const a=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,a);return a}
+ const idle=pixels();win.document.querySelector('#room-button').click();const active=pixels();
+ win.simTime=1;win.document.querySelector('#monitor-back').click();win.document.querySelector('#room-button').blur();
+ for(const time of [10,50,90,130,170,210,250,266]){win.simTime=time;win.framesToRun.splice(0).forEach(cb=>cb(time))}
+ const ended=pixels();let stuck=0,lit=0;for(let i=0;i<idle.length;i++){if(Math.abs(idle[i]-ended[i])>1)stuck++;if(Math.abs(idle[i]-active[i])>1)lit++}
+ window.testResults={passed:stuck===0&&lit>0?1:0,failed:stuck===0&&lit>0?0:1,changedDuringClick:lit,stuckChannels:stuck,remainingFrames:win.framesToRun.length};
+}catch(error){window.testResults={failed:1,error:String(error)}}document.querySelector('#result').textContent=JSON.stringify(window.testResults);
+</script></body></html>

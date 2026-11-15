@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Monitor zoom regression</title></head><body><pre id="result">Testing monitor…</pre><iframe title="Scene under test" width="800" height="600"></iframe><script type="module">
+const results=[];const check=(name,passed,details={})=>results.push({name,passed,...details});
+try{
+ const html=await(await fetch('/')).text();
+ const freeze=`<script>window.framesToRun=[];window.simTime=0;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+freeze);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const w=frame.contentWindow,d=w.document,button=d.querySelector('#room-button'),app=d.querySelector('#monitor-app'),back=d.querySelector('#monitor-back');
+ if(d.documentElement.dataset.render!=='ready')throw Error('Renderer not ready');
+ const reduced=w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function tick(t){w.simTime=t;w.framesToRun.splice(0).forEach(cb=>cb(t))}
+ check('App is initially hidden and inert',app.inert&&app.dataset.open==='false');
+ button.click();tick(600);
+ check('Click starts camera travel, not external navigation',reduced||d.documentElement.dataset.view==='transition');
+ tick(1400);
+ check('Monitor is ready for interactive HTML',app.dataset.open==='true'&&!app.inert&&button.disabled);
+ check('Focus enters return button',d.activeElement===back);
+ const a=app.getBoundingClientRect(),b=back.getBoundingClientRect();
+ check('Return button is inside the monitor screen',b.x>=a.x&&b.y>=a.y&&b.right<=a.right&&b.bottom<=a.bottom);
+ check('App matches physical screen aspect',Math.abs(a.width/a.height-1.27/.77)<.002,{width:a.width,height:a.height});
+ // Exercise real DOM interaction on the app surface; temporary test-only content.
+ const input=d.createElement('input');input.setAttribute('aria-label','Test application input');d.querySelector('#monitor-content').append(input);input.value='Works inside screen';input.focus();
+ check('Application surface accepts interactive controls',d.activeElement===input&&input.value==='Works inside screen');input.remove();
+ back.click();tick(2800);
+ check('In-screen return restores room and hides app',d.documentElement.dataset.view==='room'&&app.inert&&!button.disabled);
+ check('Focus returns to room button',d.activeElement===button);
+ check('Focus restoration schedules only one animation frame',w.framesToRun.length<=1,{queued:w.framesToRun.length});
+ button.click();tick(4200);
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));tick(5600);
+ check('Escape returns to overview',d.documentElement.dataset.view==='room'&&app.inert);
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

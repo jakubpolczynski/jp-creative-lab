@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Data signal regression</title></head>
+<body><pre id="result">Testing actual animated scene…</pre><iframe width="800" height="600" style="border:0" title="Scene under test"></iframe>
+<script type="module">
+const results=[];
+const check=(name,passed,details={})=>results.push({name,passed,...details});
+try{
+ const html=await(await fetch('/')).text();
+ const freeze=`<script>window.framesToRun=[];window.simTime=0;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/"><!-- deterministic clock -->'+freeze);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const win=frame.contentWindow;
+ if(win.document.documentElement.dataset.render!=='ready')throw Error('Scene did not render');
+ const canvas=win.document.querySelector('canvas'),gl=canvas.getContext('webgl2');
+ function pixels(time){win.simTime=time*1000;const queue=win.framesToRun.splice(0);queue.forEach(cb=>cb(win.simTime));const data=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,data);if(gl.getError())throw Error('WebGL error');return data}
+ function difference(a,b){let changed=0,green=0,blue=0;for(let i=0;i<a.length;i+=4){if(Math.max(...[0,1,2].map(j=>Math.abs(a[i+j]-b[i+j])))>2){changed++;if(b[i+1]>a[i+1]+20)green++;if(b[i+2]>a[i+2]+20)blue++}}return{changed,green,blue}}
+ const idle=pixels(0),green=pixels(2),greenLater=pixels(2.5),blue=pixels(6.4),blink=pixels(7.7),returned=pixels(8.7);
+ const out=difference(idle,green),movement=difference(green,greenLater),back=difference(idle,blue),received=difference(idle,blink),rest=difference(idle,returned);
+ const reduced=win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ check('The green outbound impulse is rendered on the cable',reduced||out.green>20,out);
+ check('The impulse moves rather than remaining in one position',reduced||movement.changed>20,movement);
+ check('The blue inbound impulse is rendered on the cable',reduced||back.blue>20,back);
+ check('Blue receipt flashes rack light accents',reduced||received.blue>500,received);
+ check('The rack returns exactly to its green resting appearance',rest.changed===0,rest);
+ // World-point checks ensure the visible crystal face (not only its edges) responds.
+ const modelScript=[...html.matchAll(/src="([^\"]+\.js)"/g)][0][1];
+ const rendererText=await(await fetch(modelScript)).text();
+ const modelUrl=rendererText.match(/fetch\('([^']+\.glb)'/)[1];
+ const bytes=await(await fetch(modelUrl)).arrayBuffer(),view=new DataView(bytes);
+ const doc=JSON.parse(new TextDecoder().decode(new Uint8Array(bytes,20,view.getUint32(12,true))).trim());
+ const norm=v=>{const len=Math.hypot(...v);return v.map(x=>x/len)};
+ const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+ const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+ const z=norm([15,13,17]),x=norm(cross([0,1,0],z)),y=cross(z,x);
+ const bounds={min:[Infinity,Infinity,Infinity],max:[-Infinity,-Infinity,-Infinity]};
+ for(const a of doc.accessors)if(a.type==='VEC3'&&a.min&&a.max)for(let j=0;j<3;j++){bounds.min[j]=Math.min(bounds.min[j],a.min[j]);bounds.max[j]=Math.max(bounds.max[j],a.max[j])}
+ const projected=[];for(let i=0;i<8;i++){const p=[0,1,2].map(j=>i&(1<<j)?bounds.max[j]:bounds.min[j]);projected.push([dot(x,p),dot(y,p)])}
+ const min=[0,1].map(j=>Math.min(...projected.map(p=>p[j]))),max=[0,1].map(j=>Math.max(...projected.map(p=>p[j])));
+ const aspect=canvas.width/canvas.height,framing=win.innerWidth<700?1.16:1.105;
+ const scale=canvas.height/Math.max((max[1]-min[1])*framing,(max[0]-min[0])*framing/aspect);
+ function sample(data,p){const px=Math.round(canvas.width/2+(dot(x,p)-(min[0]+max[0])/2)*scale),py=Math.round(canvas.height/2+(dot(y,p)-(min[1]+max[1])/2)*scale);const i=(py*canvas.width+px)*4;return Array.from(data.slice(i,i+3))}
+ const crystalIdle=sample(idle,[-4.8,5.38,.05]),crystalBlue=sample(blink,[-4.8,5.38,.05]);
+ check('The visible crystal face turns blue on server receipt',reduced||(crystalBlue[2]>crystalBlue[1]+30 && crystalIdle[1]>crystalIdle[0]+30),{crystalIdle,crystalBlue});
+ const roomBefore=pixels(13.7),roomReceipt=pixels(13.9),roomSettled=pixels(14.5);
+ for(const [name,point] of [['Overhead lamp',[1.569,3.37,-.62]],['Monitor lettering',[2.291,2.34,-.175]],['Wall neon ASCI ART',[2.085,3.58,-2.976]],['Floor LED',[6,-.02,3.47]]]){
+   const before=sample(roomBefore,point),receipt=sample(roomReceipt,point),settled=sample(roomSettled,point);
+   check(name+' turns green on data arrival',reduced||(receipt[1]>receipt[2]+30 && receipt[2]<before[2]-30),{before,receipt,settled});
+   check(name+' returns to cyan after receipt',settled.every((v,i)=>Math.abs(v-before[i])<=1),{before,settled});
+ }
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,reducedMotion:reduced,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

@@ -1,0 +1,160 @@
+<!doctype html><html><head><meta charset="utf-8"><title>ASCII converter regression</title></head><body><pre id="result">Testing…</pre><iframe title="Converter under test" width="1000" height="700"></iframe><script type="module">
+const results=[];const check=(name,passed,details={})=>results.push({name,passed,...details});
+try{
+ const html=await(await fetch('/')).text();
+ const freeze=`<script>window.matchMedia=()=>({matches:true,addEventListener(){}});<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+freeze);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const w=frame.contentWindow,d=w.document,root=d.querySelector('#ascii-converter'),input=d.querySelector('#ascii-file'),drop=d.querySelector('#ascii-drop'),preview=d.querySelector('#ascii-preview'),download=d.querySelector('#ascii-download');
+ if(d.documentElement.dataset.render!=='ready')throw Error('Scene not loaded');
+ d.querySelector('#room-button').click();
+ check('Converter title removed without removing download',!root.querySelector('h1')&&!!download);
+ check('Toolbar branding removed without removing return',!d.querySelector('.monitor-toolbar span')&&!!d.querySelector('.monitor-toolbar #monitor-back'));
+ check('Initial privacy notice is removed',d.querySelector('#ascii-status').textContent.trim()==='');
+ check('Remix controls are hidden until an image exists',!!d.querySelector('#ascii-remix')&&d.querySelector('#ascii-remix').hidden&&d.querySelector('#ascii-remix-panel').hidden);
+ check('Upload controls are above download controls',!!(drop.compareDocumentPosition(download)&w.Node.DOCUMENT_POSITION_FOLLOWING));
+ async function wait(state){for(let i=0;i<150;i++){if(root.dataset.state===state)return;await new Promise(r=>setTimeout(r,30))}throw Error('Converter state: '+root.dataset.state+' '+d.querySelector('#ascii-status').textContent)}
+ function choose(file){const data=new w.DataTransfer();data.items.add(file);input.files=data.files;input.dispatchEvent(new w.Event('change',{bubbles:true}))}
+ async function imageFile(type,name){const c=d.createElement('canvas');c.width=100;c.height=100;const ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,100,100);ctx.fillStyle='black';ctx.fillRect(15,15,70,70);ctx.fillStyle='white';ctx.fillRect(30,30,12,12);ctx.fillRect(58,30,12,12);ctx.fillRect(30,62,40,9);const blob=await new Promise(r=>c.toBlob(r,type));return new w.File([blob],name,{type})}
+ const png=await imageFile('image/png','face.png');choose(png);await wait('ready');
+ check('PNG file picker produces visible ASCII preview',!preview.hidden&&preview.textContent.includes('@')&&preview.textContent.includes(' '));
+ await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ check('Download button is removed from the visible interface',w.getComputedStyle(download).display==='none');
+ const rowControls=[d.querySelector('.ascii-file-label'),d.querySelector('#ascii-paste'),d.querySelector('#ascii-format')];
+ const rowY=rowControls.map(el=>el.getBoundingClientRect().top);
+ check('All converter controls share one line',Math.max(...rowY)-Math.min(...rowY)<2,{tops:rowY});
+ const savedWidth=root.style.width;root.style.width='562px';await new Promise(r=>requestAnimationFrame(r));
+ const narrowY=rowControls.map(el=>el.getBoundingClientRect().top);
+ check('Controls stay on one line at annotated monitor width',Math.max(...narrowY)-Math.min(...narrowY)<2,{tops:narrowY});
+ root.style.width=savedWidth;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ const remix=d.querySelector('#ascii-remix'),panel=d.querySelector('#ascii-remix-panel');
+ if(remix&&panel){
+  const original=preview.innerHTML;remix.click();
+  check('Remix opens settings without changing generated art',!panel.hidden&&remix.getAttribute('aria-expanded')==='true'&&preview.innerHTML===original);
+  async function adjust(id,value){const el=d.querySelector(id);if(el.type==='checkbox')el.checked=value;else el.value=value;el.dispatchEvent(new w.Event('input',{bubbles:true}));await new Promise(r=>setTimeout(r,250));}
+  await adjust('#remix-brightness','65');check('Brightness slider remixes the actual preview',preview.innerHTML!==original);
+  d.querySelector('#remix-reset').click();await new Promise(r=>setTimeout(r,250));check('Reset restores original characters and colors',preview.innerHTML===original);
+  await adjust('#remix-width','80');check('Detail slider resamples original image at new width',preview.textContent.split('\n').every(line=>line.length===80));
+  await adjust('#remix-stretch','1.5');check('Vertical stretch changes rendered row count',preview.textContent.split('\n').length===60);
+  await adjust('#remix-invert',true);check('Invert changes generated characters',preview.textContent[0]==='@');
+  const preset=d.querySelector('#remix-preset');preset.value='matrix';preset.dispatchEvent(new w.Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,250));
+  check('Matrix preset updates palette and preview background',w.getComputedStyle(preview).backgroundColor!=='rgb(248, 250, 252)'&&[...preview.querySelectorAll('span')].some(e=>{const rgb=w.getComputedStyle(e).color.match(/\d+/g).map(Number);return rgb[1]>180&&rgb[1]>rgb[0]*1.5&&rgb[1]>rgb[2]*1.5}));
+  const remixExport=new w.DOMParser().parseFromString(await(await fetch(download.href)).text(),'text/html');
+  check('Export follows current remixed preview',remixExport.querySelector('pre')?.textContent===preview.textContent&&remixExport.querySelector('pre')?.innerHTML===preview.innerHTML);
+  remix.click();check('Closing Remix keeps edited image',panel.hidden&&remix.getAttribute('aria-expanded')==='false');
+  remix.click();d.querySelector('#remix-reset').click();await new Promise(r=>setTimeout(r,250));remix.click();
+ }
+ const viewport=d.querySelector('#monitor-content');
+ const font=parseFloat(w.getComputedStyle(preview).fontSize);
+ check('Preview characters fill available width instead of shrinking to height',font*120*.6>=preview.clientWidth*.9,{font,width:preview.clientWidth});
+ const exportedFace=await(await fetch(download.href)).text();
+ const text=new w.DOMParser().parseFromString(exportedFace,'text/html').querySelector('pre')?.textContent;
+ check('Download preserves exact ASCII text inside colored HTML',text===preview.textContent&&download.download==='face-ascii.html'&&!download.hidden);
+ check('Output preserves aspect ratio and all line widths',text.split('\n').length===60&&text.split('\n').every(s=>s.length===120));
+ const coloredSvg=new w.File(['<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60"><rect width="40" height="60" fill="#ff0000"/><rect x="40" width="40" height="60" fill="#00a040"/><rect x="80" width="40" height="60" fill="#0040ff"/></svg>'],'kolory.svg',{type:'image/svg+xml'});
+ choose(coloredSvg);await wait('ready');
+ const colors=new Set([...preview.querySelectorAll('span')].map(span=>w.getComputedStyle(span).color));
+ check('Preview renders original red green and blue character colors',colors.has('rgb(255, 0, 0)')&&colors.has('rgb(0, 160, 64)')&&colors.has('rgb(0, 64, 255)'));
+ const exported=await(await fetch(download.href)).text(),exportDoc=new w.DOMParser().parseFromString(exported,'text/html');
+ check('Color download is a standalone HTML matching visible characters',download.download==='kolory-ascii.html'&&exportDoc.querySelector('pre')?.textContent===preview.textContent&&exportDoc.querySelector('span')?.style.color==='rgb(255, 0, 0)');
+ if(remix&&panel){
+  remix.click();
+  const colorOriginal=preview.innerHTML;
+  for(const [id,value] of [['#remix-contrast','1.5'],['#remix-saturation','0'],['#remix-edges','100'],['#remix-palette','amber'],['#remix-ramp','01 ']]){
+   d.querySelector('#remix-reset').click();await new Promise(r=>setTimeout(r,100));
+   const control=d.querySelector(id);control.value=value;control.dispatchEvent(new w.Event('input',{bubbles:true}));await new Promise(r=>setTimeout(r,200));
+   check('Live edit '+id+' changes rendered glyphs or colors',preview.innerHTML!==colorOriginal);
+  }
+  const background=d.querySelector('#remix-background');background.value='#123456';background.dispatchEvent(new w.Event('input',{bubbles:true}));await new Promise(r=>setTimeout(r,200));
+  check('Background edit changes preview and exported background',w.getComputedStyle(preview).backgroundColor==='rgb(18, 52, 86)'&&(await(await fetch(download.href)).text()).includes('background:#123456'));
+  const widthControl=d.querySelector('#remix-width');for(const value of [40,240,90]){widthControl.value=value;widthControl.dispatchEvent(new w.Event('input',{bubbles:true}));}
+  await new Promise(r=>setTimeout(r,250));check('Rapid edits retain the latest setting',preview.textContent.split('\n')[0].length===90);
+  d.querySelector('#remix-reset').click();await new Promise(r=>setTimeout(r,150));remix.click();
+ }
+ const format=d.querySelector('#ascii-format');
+ check('HTML PNG JPG TXT export choices exist',!!format&&['html','png','jpg','txt'].every(value=>[...format.options].some(o=>o.value===value)));
+ if(format){
+  for(const value of ['txt','png','jpg']){
+   format.value=value;format.dispatchEvent(new w.Event('change',{bubbles:true}));
+   for(let i=0;i<150;i++){if(download.getAttribute('href')&&download.download==='kolory-ascii.'+value)break;await new Promise(r=>setTimeout(r,30))}
+   const blob=await(await fetch(download.href)).blob();
+   if(value==='txt')check('TXT export matches ASCII characters',await blob.text()===preview.textContent);
+   else{
+    const bitmap=await createImageBitmap(blob),canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;
+    const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let red=0,blue=0,background=0;for(let i=0;i<pixels.length;i+=4){if(pixels[i]>150&&pixels[i+1]<90&&pixels[i+2]<90)red++;if(pixels[i+2]>150&&pixels[i]<90)blue++;if(pixels[i]>240&&pixels[i+1]>240&&pixels[i+2]>240)background++;}
+    check(value.toUpperCase()+' export is a large colored ASCII image',blob.type===(value==='png'?'image/png':'image/jpeg')&&bitmap.width>1200&&red>100&&blue>100&&background>red+blue,{width:bitmap.width,height:bitmap.height,red,blue});bitmap.close();
+   }
+  }
+  format.value='html';format.dispatchEvent(new w.Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,40));
+ }
+ choose(png);await wait('ready');
+ const pasted=new w.DataTransfer();pasted.items.add(new w.File([png],'schowek.png',{type:'image/png'}));
+ const pasteEvent=new w.ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData:pasted});
+ d.dispatchEvent(pasteEvent);await new Promise(r=>setTimeout(r,100));
+ check('Pasting a screenshot converts it and enables download',pasteEvent.defaultPrevented&&download.download==='schowek-ascii.html'&&root.dataset.state==='ready',{prevented:pasteEvent.defaultPrevented,downloadName:download.download,state:root.dataset.state,open:d.querySelector('#monitor-app').dataset.open,items:[...pasteEvent.clipboardData.items].map(i=>({kind:i.kind,type:i.type,name:i.getAsFile()?.name}))});
+ const pasteButton=d.querySelector('#ascii-paste');
+ const clipboard={calls:0,async read(){this.calls++;return [new w.ClipboardItem({'image/png':png})]}};
+ Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:clipboard});
+ pasteButton?.click();await new Promise(r=>setTimeout(r,100));
+ check('Paste button reads an image and converts it',!!pasteButton&&clipboard.calls===1&&download.download==='schowek-ascii.html'&&root.dataset.state==='ready');
+ clipboard.read=async()=>{throw new w.DOMException('Denied','NotAllowedError')};pasteButton.click();await new Promise(r=>setTimeout(r,30));
+ check('Clipboard permission denial offers Ctrl+V without losing result',d.querySelector('#ascii-status').textContent.includes('Ctrl + V')&&!preview.hidden&&!download.hidden);
+ clipboard.read=async()=>[];pasteButton.click();await new Promise(r=>setTimeout(r,30));
+ check('Empty clipboard gives actionable message',d.querySelector('#ascii-status').textContent.includes('Brak obrazu'));
+ for(const mode of ['denied','unavailable','empty']){
+  let release;
+  const gate=new Promise(resolve=>{release=resolve});
+  const file=new w.File([await coloredSvg.text()],'pending-'+mode+'.svg',{type:'image/svg+xml'});
+  file.text=async()=>{await gate;return w.File.prototype.text.call(file)};
+  clipboard.read=mode==='unavailable'?undefined:async()=>{if(mode==='denied')throw new w.DOMException('Denied','NotAllowedError');return []};
+  choose(file);
+  if(root.dataset.state!=='loading')throw Error('Upload did not enter loading before clipboard '+mode);
+  pasteButton.click();await new Promise(r=>setTimeout(r,30));
+  const revoke=w.URL.revokeObjectURL;
+  let decoded;const decoding=new Promise(resolve=>{decoded=resolve});
+  w.URL.revokeObjectURL=url=>{revoke.call(w.URL,url);decoded()};
+  try{release();await decoding;await new Promise(r=>setTimeout(r,30))}finally{w.URL.revokeObjectURL=revoke}
+  check('Clipboard '+mode+' does not cancel a pending real upload',root.dataset.state==='ready'&&!preview.hidden&&!download.hidden&&download.download==='pending-'+mode+'-ascii.html'&&d.querySelector('#ascii-status').textContent==='',{state:root.dataset.state,status:d.querySelector('#ascii-status').textContent,downloadName:download.download});
+ }
+ function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no});return {promise,resolve,reject}}
+ for(const outcome of ['image','blob','empty','denied']){
+  const pending=deferred(),readingBlob=deferred();
+  clipboard.read=()=>outcome==='blob'?Promise.resolve([{types:['image/png'],getType(){readingBlob.resolve();return pending.promise}}]):pending.promise;
+  pasteButton.click();if(outcome==='blob')await readingBlob.promise;
+  choose(png);await wait('ready');const revision=preview.dataset.revision;
+  if(outcome==='denied')pending.reject(new w.DOMException('Denied','NotAllowedError'));
+  else pending.resolve(outcome==='blob'?png:outcome==='empty'?[]:[new w.ClipboardItem({'image/png':png})]);
+  await new Promise(r=>setTimeout(r,30));
+  check('Late clipboard '+outcome+' cannot overwrite a newer upload',root.dataset.state==='ready'&&download.download==='face-ascii.html'&&preview.dataset.revision===revision&&d.querySelector('#ascii-status').textContent==='');
+ }
+ for(const newer of ['image','empty','unavailable']){
+  const first=deferred();clipboard.read=()=>first.promise;pasteButton.click();
+  clipboard.read=newer==='unavailable'?undefined:async()=>newer==='empty'?[]:[new w.ClipboardItem({'image/svg+xml':coloredSvg})];
+  pasteButton.click();await new Promise(r=>setTimeout(r,60));
+  const revision=preview.dataset.revision,message=d.querySelector('#ascii-status').textContent;
+  first.resolve([new w.ClipboardItem({'image/png':png})]);await new Promise(r=>setTimeout(r,30));
+  check('Latest paste '+newer+' supersedes an older clipboard read',root.dataset.state==='ready'&&preview.dataset.revision===revision&&d.querySelector('#ascii-status').textContent===message&&(newer!=='image'||download.download==='schowek-ascii.html'&&preview.textContent.split('\n').length===30));
+ }
+ const plain=new w.DataTransfer();plain.setData('text/plain','not an image');const textPaste=new w.ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData:plain});d.dispatchEvent(textPaste);
+ check('Normal text paste is not intercepted',!textPaste.defaultPrevented);
+ const jpeg=await imageFile('image/jpeg','photo.jpg');choose(jpeg);await wait('ready');check('JPEG supported',preview.textContent.includes('@'));
+ const svg=new w.File(['<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60"><rect width="120" height="60" fill="white"/><circle cx="60" cy="30" r="24" fill="black"/></svg>'],'shape.svg',{type:'image/svg+xml'});
+ const data=new w.DataTransfer();data.items.add(svg);drop.dispatchEvent(new w.DragEvent('drop',{bubbles:true,cancelable:true,dataTransfer:data}));await wait('ready');
+ check('SVG drag-and-drop converts and replaces previous result',download.download==='shape-ascii.html'&&preview.textContent.split('\n').length===30);
+ const {cleanSvg,convertImage}=await import('/ascii.js');
+ const safe=cleanSvg('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(1)</scr'+'ipt><image href="https://example.com/a.png"/><foreignObject><div>bad</div></foreignObject><style>@import "https://example.com/x.css";</style><rect width="10" height="10" fill="black" onclick="alert(1)"/></svg>');
+ check('SVG sanitization removes script, remote resources, CSS and event handlers',!/<script|<style|foreignObject|onload|onclick|https:\/\/example/i.test(safe));
+ const bad=new w.File(['not an image'],'broken.png',{type:'image/png'});choose(bad);await wait('error');
+ check('Corrupt image shows error without stale output',preview.hidden&&download.hidden&&d.querySelector('#ascii-status').textContent.includes('odczytać'));
+ let rejected=false;try{await convertImage(new File(['x'],'x.txt',{type:'text/plain'}))}catch{rejected=true}check('Non-image files rejected',rejected);
+ rejected=false;try{await convertImage(new File([new Uint8Array(20*1024*1024+1)],'big.png',{type:'image/png'}))}catch{rejected=true}check('File size limit enforced',rejected);
+ choose(png);await wait('ready');check('Recovers after invalid upload',!preview.hidden&&!download.hidden);
+ d.querySelector('#monitor-back').click();check('Converter retains result after leaving monitor',preview.textContent.length>0&&d.documentElement.dataset.view==='room');
+ const closedPaste=new w.ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData:pasted});d.dispatchEvent(closedPaste);
+ check('Pasting outside monitor does not start conversion',!closedPaste.defaultPrevented&&root.dataset.state==='ready');
+ d.querySelector('#room-button').click();check('Converter reopens with previous result',!preview.hidden&&d.documentElement.dataset.view==='monitor');
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

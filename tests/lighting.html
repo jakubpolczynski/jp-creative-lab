@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Lighting occlusion regression</title>
+<style>html,body{margin:0;width:100%;height:100%}canvas{width:640px;height:480px;display:block}</style></head>
+<body><canvas id="scene"></canvas><div id="status"></div>
+<script type="module">
+// Exercise the production WebGL renderer with deterministic real GLB fixtures.
+const script = [...(await (await fetch('/')).text()).matchAll(/src="([^\"]+\.js)"/g)][0][1];
+const originalFetch = window.fetch.bind(window);
+const cases = new Map();
+const results = [];
+const green = [40,255,70,255];
+function fixture({occluded=false,emissive=true}={}) {
+ const groups = [[],[]];
+ const corners = [[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0]];
+ // Parallel to the fixed camera's image plane, with all three dimensions in bounds.
+ const eye=[15,13,17], length=Math.hypot(...eye), toward=eye.map(v=>v/length);
+ const right=[17,0,-15].map(v=>v/Math.hypot(17,15));
+ const up=[toward[1]*right[2]-toward[2]*right[1],toward[2]*right[0]-toward[0]*right[2],toward[0]*right[1]-toward[1]*right[0]];
+ function plane(group,size,depth,color){
+  const normal=toward;
+  const pos=corners.map(([x,y])=>right.map((v,i)=>v*x*size+up[i]*y*size+toward[i]*depth));
+  groups[group].push({pos,normal,color});
+ }
+ plane(0,3,-2,[45,50,90,255]); // Opaque backdrop fixes framing, identical in all fixtures.
+ if(occluded)plane(0,1.8,1,[45,50,90,255]); // Solid wall in front of the green source.
+ if(emissive)plane(1,.55,0,green);
+ const chunks=[],bufferViews=[],accessors=[],primitives=[];let byteOffset=0;
+ function accessor(array,type,componentType,target,extra={}){
+  const bytes=new Uint8Array(array.buffer);chunks.push(bytes);
+  const bufferView=bufferViews.length;bufferViews.push({buffer:0,byteOffset,byteLength:bytes.length,target});byteOffset+=bytes.length;
+  const index=accessors.length;accessors.push({bufferView,componentType,count:array.length/({VEC3:3,VEC4:4,SCALAR:1}[type]),type,...extra});return index;
+ }
+ for(let material=0;material<2;material++){
+  const pos=[],normals=[],colors=[],indices=[];
+  for(const p of groups[material]){const base=pos.length/3;pos.push(...p.pos.flat());for(let i=0;i<4;i++){normals.push(...p.normal);colors.push(...p.color)}indices.push(base,base+1,base+2,base,base+2,base+3)}
+  if(!pos.length)continue;
+  const min=[0,1,2].map(j=>Math.min(...pos.filter((_,i)=>i%3===j))),max=[0,1,2].map(j=>Math.max(...pos.filter((_,i)=>i%3===j)));
+  const POSITION=accessor(new Float32Array(pos),'VEC3',5126,34962,{min,max});
+  const NORMAL=accessor(new Float32Array(normals),'VEC3',5126,34962);
+  const COLOR_0=accessor(new Uint8Array(colors),'VEC4',5121,34962,{normalized:true});
+  const ind=accessor(new Uint32Array(indices),'SCALAR',5125,34963);
+  primitives.push({attributes:{POSITION,NORMAL,COLOR_0},indices:ind,material});
+ }
+ const doc={asset:{version:'2.0'},scene:0,scenes:[{nodes:[0]}],nodes:[{mesh:0}],meshes:[{primitives}],materials:[{},{}],bufferViews,accessors,buffers:[{byteLength:byteOffset}]};
+ const json=new TextEncoder().encode(JSON.stringify(doc));const jsonLength=Math.ceil(json.length/4)*4;
+ const buffer=new ArrayBuffer(12+8+jsonLength+8+byteOffset),view=new DataView(buffer);let offset=0;
+ for(const x of [0x46546c67,2,buffer.byteLength,jsonLength,0x4e4f534a]){view.setUint32(offset,x,true);offset+=4}
+ new Uint8Array(buffer,offset,jsonLength).fill(32);new Uint8Array(buffer,offset,json.length).set(json);offset+=jsonLength;
+ view.setUint32(offset,byteOffset,true);view.setUint32(offset+4,0x004e4942,true);offset+=8;
+ for(const chunk of chunks){new Uint8Array(buffer,offset,chunk.length).set(chunk);offset+=chunk.length}
+ return buffer;
+}
+window.fetch = (input,options) => String(input).endsWith('.glb') ? Promise.resolve(new Response(cases.get('active'),{status:200})) : originalFetch(input,options);
+async function render(options){
+ cases.set('active',fixture(options));delete document.documentElement.dataset.render;
+ const old=document.querySelector('#scene'),canvas=old.cloneNode();old.replaceWith(canvas);
+ await import(script+'?regression='+Math.random());
+ for(let i=0;i<150 && document.documentElement.dataset.render!=='ready';i++)await new Promise(r=>setTimeout(r,20));
+ if(document.documentElement.dataset.render!=='ready')throw Error('Renderer failed: '+document.querySelector('#status').textContent);
+ const gl=canvas.getContext('webgl2'),pixels=new Uint8Array(canvas.width*canvas.height*4);
+ gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+ return {pixels,width:canvas.width,height:canvas.height};
+}
+function check(name,condition,details){results.push({name,passed:condition,...details});}
+try{
+ const hidden=await render({occluded:true}),wallOnly=await render({occluded:true,emissive:false});
+ let changed=0,maxDifference=0;
+ for(let i=0;i<hidden.pixels.length;i+=4){let delta=0;for(let j=0;j<3;j++)delta=Math.max(delta,Math.abs(hidden.pixels[i+j]-wallOnly.pixels[i+j]));if(delta>1)changed++;maxDifference=Math.max(maxDifference,delta)}
+ check('An emitter fully hidden behind an opaque wall contributes no visible glow',changed===0,{changedPixels:changed,maxDifference});
+ const visible=await render({occluded:false}),backdrop=await render({emissive:false});
+ let haloPixels=0;for(let i=0;i<visible.pixels.length;i+=4){const delta=visible.pixels[i+1]-backdrop.pixels[i+1];if(delta>2 && delta<80)haloPixels++}
+ check('Soft bloom around an unoccluded source is preserved',haloPixels>100,{haloPixels});
+ let greenPixels=0;for(let i=0;i<visible.pixels.length;i+=4)if(visible.pixels[i+1]>visible.pixels[i]+30 && visible.pixels[i+1]>visible.pixels[i+2]+30)greenPixels++;
+ check('Unoccluded green sources remain visible',greenPixels>100,{greenPixels});
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#status').textContent=JSON.stringify(window.testResults);
+</script></body></html>

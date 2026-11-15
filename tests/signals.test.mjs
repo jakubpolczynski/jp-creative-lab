@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+const url = new URL('../signals.js', import.meta.url);
+let source;
+try { source = await fs.readFile(url, 'utf8'); } catch { assert.fail('Missing deterministic signal animation module'); }
+const {signalState, CYCLE_SECONDS} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const length=12;
+const start=signalState(1,length), out=signalState(2,length), later=signalState(3,length);
+assert.ok(start.outbound>=0 && start.outbound<.01,'Green starts at server');
+assert.ok(out.outbound>start.outbound && later.outbound>out.outbound,'Green moves toward PC');
+assert.equal(out.inbound,-100,'No unrelated blue impulse during green journey');
+const back=signalState(5,length), near=signalState(7.5,length);
+assert.ok(back.inbound>near.inbound && near.inbound>=0,'Blue returns toward server');
+assert.equal(back.rackBlink,0,'No premature rack blink');
+assert.ok(signalState(7.68,length).rackBlink>.5,'Blue arrival triggers rack blink');
+assert.equal(signalState(8.6,length).rackBlink,0,'Rack returns to green');
+assert.deepEqual(signalState(2+CYCLE_SECONDS,length),out,'Cycle repeats deterministically');
+assert.equal(signalState(3.7,length).roomBlink,0,'Room must not react before green arrival');
+assert.ok(signalState(3.9,length).roomBlink>.5,'Green arrival triggers room accents');
+assert.equal(signalState(4.5,length).roomBlink,0,'Room returns to cyan before reply');
+assert.deepEqual(signalState(7.68,length,true),{outbound:-100,inbound:-100,rackBlink:0,roomBlink:0},'Reduced motion disables pulses/blink');
+console.log('PASS signal directions, timing, arrival blink, repeat cycle, reduced motion');

@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Monitor logo visibility regression</title></head><body><pre id="result">Testing…</pre><iframe title="Scene" width="800" height="600"></iframe><script type="module">
+try{
+ const html=await(await fetch('/')).text();
+ const setup=`<script>window.framesToRun=[];window.simTime=0;window.logoSamples=[];window.forceLogo=false;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};const names=new WeakMap(),p=WebGL2RenderingContext.prototype,get=p.getUniformLocation,set=p.uniform1f;p.getUniformLocation=function(program,name){const loc=get.call(this,program,name);if(loc)names.set(loc,name);return loc};p.uniform1f=function(loc,value){if(names.get(loc)==='uHideMonitorLogo'){window.logoSamples.push(value);if(window.forceLogo)value=0}return set.call(this,loc,value)};<\/script>`;
+ const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+setup);
+ for(let i=0;i<150;i++){if(frame.contentDocument?.documentElement.dataset.render==='ready')break;await new Promise(r=>setTimeout(r,40))}
+ const w=frame.contentWindow,d=w.document,c=d.querySelector('canvas'),gl=c.getContext('webgl2');
+ if(d.documentElement.dataset.render!=='ready')throw Error('Scene not ready');
+ function pixels(){const a=new Uint8Array(c.width*c.height*4);gl.readPixels(0,0,c.width,c.height,gl.RGBA,gl.UNSIGNED_BYTE,a);return a}
+ function tick(t){w.simTime=t;w.framesToRun.splice(0).forEach(cb=>cb(t))}
+ const idle=w.logoSamples.at(-1);
+ d.querySelector('#room-button').click();tick(700);const hidden=pixels(),during=w.logoSamples.at(-1);
+ w.forceLogo=true;w.dispatchEvent(new w.Event('resize'));const visible=pixels();let changed=0;for(let i=0;i<hidden.length;i+=4)if(Math.max(...[0,1,2].map(j=>Math.abs(hidden[i+j]-visible[i+j])))>5)changed++;
+ w.forceLogo=false;d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));tick(2200);
+ const results=[{name:'JP and brackets stay visible in overview',passed:idle===0},{name:'JP and brackets are hidden during zoom',passed:during===1&&changed>50,changedPixels:changed},{name:'JP and brackets return after zooming out',passed:w.logoSamples.at(-1)===0}];
+ window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error)}}document.querySelector('#result').textContent=JSON.stringify(window.testResults);
+</script></body></html>

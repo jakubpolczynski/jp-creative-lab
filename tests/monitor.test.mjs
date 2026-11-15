@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+let source;try{source=await fs.readFile(new URL('../monitor.js',import.meta.url),'utf8')}catch{assert.fail('Monitor camera module missing')}
+const {createMonitorTransition,monitorProgress,monitorFrame,chairPose}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const state=createMonitorTransition();assert.equal(monitorProgress(state,0,false),0);
+state.from=0;state.to=1;state.started=100;
+assert.equal(monitorProgress(state,100,false),0);
+const mid=monitorProgress(state,700,false);assert.ok(mid>0&&mid<1);
+assert.equal(monitorProgress(state,1500,false),1);
+assert.equal(monitorProgress(state,101,true),1,'Reduced motion skips camera travel');
+const wide=monitorFrame(1280,900),narrow=monitorFrame(390,844);
+assert.ok(wide.width<1280&&wide.height<900);
+assert.ok(narrow.width<390&&narrow.height<844);
+assert.ok(Math.abs(wide.width/wide.height-1.27/.77)<1e-9);
+assert.ok(Math.abs(narrow.width/narrow.height-1.27/.77)<1e-9);
+assert.ok(wide.top>=70&&narrow.top>=70,'Back button remains reachable');
+assert.equal(typeof chairPose,'function','Chair choreography must be implemented');
+assert.deepEqual(chairPose(0),{angle:0,x:0,z:0});
+const chairMid=chairPose(.2),chairEnd=chairPose(1);
+assert.ok(chairMid.angle>0&&chairMid.angle<chairEnd.angle,'Turns left smoothly');
+assert.ok(chairMid.x>0&&chairMid.z<0,'Slides to visual right at the same time');
+assert.ok(chairEnd.angle>1&&chairEnd.angle<1.6,'Clear left swivel without a full spin');
+assert.ok(chairEnd.z< -1.3&&chairEnd.x>.4,'Clears the monitor sightline to the right');
+assert.deepEqual(chairPose(.55),chairEnd,'Chair clears before camera finishes');
+console.log('PASS camera, chair left swivel and slide, reversible pose, reduced motion, screen fit');
