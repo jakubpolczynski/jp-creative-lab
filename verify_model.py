@@ -32,7 +32,7 @@ for group in builder.COLLECTIONS:
     assert len(group['pos'])==len(group['normal'])==len(group['colors'])
     assert all(math.isfinite(v) for p in group['pos'] for v in p)
 
-assert (ROOT/'viewer.js').exists()
+assert any(ROOT.glob('viewer.*.js'))
 assert (ROOT/'index.html').exists()
 print('PASS: GLB structure, frame, desk cabinet, chair contact, mouse placement and mesh values')
 print('Boxes:',builder.BOX_COUNTER,'GLB bytes:',len(model),'triangles:',sum(len(x['idx'])//3 for x in builder.COLLECTIONS))

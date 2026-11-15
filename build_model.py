@@ -9,8 +9,12 @@ import numpy as np
 
 ROOT=pathlib.Path(__file__).parent
 # Two separate primitives (opaque and self-illuminated voxel surfaces).
-COLLECTIONS=[{'pos':[], 'normal':[], 'colors':[], 'idx':[]}, {'pos':[], 'normal':[], 'colors':[], 'idx':[]}]
+COLLECTIONS=[{'pos':[], 'normal':[], 'colors':[], 'idx':[], 'signal':[], 'rack':[], 'room':[], 'button':[], 'chair':[]} for _ in range(2)]
 BOX_COUNTER=0
+RACK_ACTIVE=False
+ROOM_ACTIVE=False
+ROOM_GEOMETRY=False
+CHAIR_ACTIVE=False
 
 def rgb(color):
     color=color.lstrip('#'); return tuple(int(color[i:i+2],16) for i in (0,2,4))
@@ -28,10 +32,12 @@ faces=[
   (( 0, 0,-1),(0,1,2,3),0.79), # -Z
 ]
 
-def box(x,y,z,w,h,d,color,emission=False,shade=True):
+def box(x,y,z,w,h,d,color,emission=False,shade=True,signal=None):
     global BOX_COUNTER
     if min(w,h,d)<=0: raise ValueError('Invalid box size')
     BOX_COUNTER+=1
+    if RACK_ACTIVE and emission:
+        color='#59ff89'
     p=COLLECTIONS[bool(emission)]
     xmin,xmax=x-w/2,x+w/2; ymin,ymax=y-h/2,y+h/2; zmin,zmax=z-d/2,z+d/2
     corners=[(xmin,ymin,zmin),(xmax,ymin,zmin),(xmax,ymax,zmin),(xmin,ymax,zmin),
@@ -39,6 +45,13 @@ def box(x,y,z,w,h,d,color,emission=False,shade=True):
     for normal,inds,factor in faces:
         start=len(p['pos'])
         p['pos'].extend([corners[i] for i in inds]);p['normal'].extend([normal]*4)
+        p['rack'].extend([float(RACK_ACTIVE and emission)]*4)
+        p['room'].extend([float(ROOM_ACTIVE and emission)]*4)
+        p['chair'].extend([float(CHAIR_ACTIVE)]*4)
+        # The external cable flexes continuously from the fixed rack to the room.
+        p['button'].extend([1.0 if ROOM_GEOMETRY else 0.0 if RACK_ACTIVE else max(0.0,min(1.0,(corners[i][0]+2.20)/3.74)) for i in inds])
+        for i in inds:
+            p['signal'].append(-100.0 if signal is None else signal(corners[i]))
         color_face=tint(color,factor if shade and not emission else 1.0)
         p['colors'].extend([color_face+(255,)]*4)
         p['idx'].extend([start,start+1,start+2,start,start+2,start+3])
@@ -54,6 +67,12 @@ def stud(x,y,z,s=.12,color='#7688bd'):
 
 # pixel alphabet on vertical faces, rendered as real voxel geometry
 GLYPH={
+'A':['01110','10001','11111','10001','10001'],
+'S':['01111','10000','01110','00001','11110'],
+'C':['01111','10000','10000','10000','01111'],
+'I':['11111','00100','00100','00100','11111'],
+'R':['11110','10001','11110','10100','10010'],
+'T':['11111','00100','00100','00100','00100'],
 'J':['00111','00010','00010','10010','01100'],
 'P':['11110','10001','11110','10000','10000'],
 '>':['10000','01000','00100','01000','10000'],
@@ -88,6 +107,7 @@ def bracket(face,x,y,z,s=.45,color='#5cdfff'):
                 box(x,by-sy*.09,bz,.035,.19,.035,color,True)
 
 # --- SERVER CORE / FLOATING PLINTH ---
+RACK_ACTIVE=True
 rx,rz=-4.8,.05
 # Layered floating plinth / bevel blocks
 box(rx,-.12,rz,3.65,.34,3.35,'#161f41')
@@ -151,7 +171,7 @@ for xx in (rx-1.23,rx+1.23):
 box(rx,4.27,rz,1.79,.25,1.7,'#152647')
 box(rx,4.41,rz,1.54,.13,1.47,'#4bf36c',True)
 box(rx,4.60,rz,1.26,.46,1.25,'#193d42')
-box(rx,4.89,rz,.99,.98,.98,'#2ac973')
+box(rx,4.89,rz,.99,.98,.98,'#2ac973',True)
 box(rx,4.91,rz,.84,.81,.84,'#3ffb62',True)
 # crystal edge rails
 for dx in (-.50,.50):
@@ -162,7 +182,9 @@ for dx in (-.50,.50):
 for dz in (-.50,.50):
     box(rx,5.41,rz+dz,1.05,.035,.037,'#c1ffb8',True)
 
+RACK_ACTIVE=False
 # --- OFFICE MODULE: TWO CUTAWAY WALLS AND A FLOOR ---
+ROOM_GEOMETRY=True
 room_x0,room_x1=1.24,8.73
 room_z0,room_z1=-3.20,3.28
 room_x=(room_x0+room_x1)/2
@@ -172,8 +194,10 @@ box(room_x,-.075,room_z,7.72,.44,6.74,'#1a2448')
 box(room_x,.115,room_z,7.77,.28,6.77,'#5b65a7')
 box(room_x,.265,room_z,7.45,.12,6.48,'#34375d')
 # underglow strips only near perimeter
+ROOM_ACTIVE=True
 for zz in (room_z0-.15,room_z1+.15):box(room_x,-.02,zz,7.58,.058,.08,'#4acbfc',True)
 for xx in (room_x0-.17,room_x1+.17):box(xx,-.02,room_z,.08,.058,6.48,'#4ccaff',True)
+ROOM_ACTIVE=False
 # floor tile 10x9
 nx,nz=10,9
 for ix in range(nx):
@@ -202,9 +226,18 @@ for xx in (room_x0,room_x1):box(xx,2.04,room_z0,.38,3.74,.36,'#7777bf')
 # side panel / base accent frame
 box(room_x0,.50,room_z,.28,.21,6.66,'#8b86c9')
 box(room_x,.50,room_z0,7.60,.21,.27,'#8783c5')
-# cyan overhead lamp on LEFT room wall, no letters or logo on walls
+# Raised voxel neon on the back wall: preserve the requested spelling exactly.
+WALL_NEON='ASCI ART'
+box(room_x,2.14,room_z0+.16,7.0,3.12,.06,'#202543')
+ROOM_ACTIVE=True
+pixel_text('+z',1.795,3.00,room_z0+.21,'ASCI',.29,'#62eaff')
+pixel_text('+z',2.665,1.40,room_z0+.21,'ART',.29,'#62eaff')
+ROOM_ACTIVE=False
+# cyan overhead lamp on LEFT room wall
 box(room_x0+.16,3.38,-.62,.25,.20,2.96,'#131e48')
+ROOM_ACTIVE=True
 box(room_x0+.302,3.37,-.62,.055,.078,2.67,'#37d8ff',True)
+ROOM_ACTIVE=False
 for zz in (-1.86,.62):box(room_x0+.18,3.36,zz,.09,.29,.11,'#24365d')
 # room wall baseboard
 box(room_x0+.16,.57,room_z,.11,.12,6.49,'#56558b')
@@ -246,8 +279,10 @@ box(mx,2.21,mz,.25,1.05,1.55,'#101e40')
 box(mx+.154,2.21,mz,.055,.86,1.36,'#283a77')
 box(mx+.194,2.21,mz,.032,.77,1.27,'#111a54')
 # pixel corner brackets + JP on the MONITOR ONLY
+ROOM_ACTIVE=True
 bracket('+x',mx+.221,2.22,mz,.435,'#6ee6ff')
 pixel_text('+x',mx+.247,2.21,mz+.40,'JP',.065,'#6ceaff')
+ROOM_ACTIVE=False
 # Real raised 3D keyboard keycaps: five rows instead of three painted strips.
 keyboard_x=desk_x+.44
 keyboard_z=-.32
@@ -282,6 +317,7 @@ box(desk_x-.2,1.78,-1.65,.09,.36,.09,'#357a4e')
 for px,py,pz,ps in [(-.25,1.99,-1.61,.24),(-.36,1.91,-1.76,.19),(-.08,1.97,-1.63,.21),(-.2,2.18,-1.59,.18),(-.2,1.92,-1.42,.19)]:
     box(desk_x+px,py,pz,ps,ps,ps,'#48b34f')
 # Grounded, non-floating ergonomic chair: wheels rest on top of the actual floor.
+CHAIR_ACTIVE=True
 chair_x,chair_z=3.25,-.55
 chair_lift=FLOOR_Y-(.18-.13/2)   # bottom of each caster exactly matches floor y=.388
 cy=lambda y:y+chair_lift
@@ -298,32 +334,42 @@ for dx in (-.35,.35):
 for dz in (-.43,.43):
     box(chair_x+.04,cy(1.04),chair_z+dz,.57,.08,.12,'#3e4972')
 
-# --- EXTERIOR GREEN CONDUIT: ENTERS THE BACK OF LEFT WALL; NO CABLE IN THE ROOM ---
-# Connected rack positive-X side, across floating void, bends then enters room x=room_x0 from outside.
-yc=1.92
-# x coordinates from rack front until wall x~1.1
-x_a=rx+1.37
-x_b=-2.55
-x_c=-1.72
-x_d=.92
-# dark armored casing with twin luminescent tracks, visibly external to wall
-segments=[(x_a,x_b,1.02),(x_b,x_c,1.02),(x_c,x_d,.74),(x_d,room_x0-.075,.74)]
-# Make step-shaped conduit in x,z with visible joint boxes. x oriented conduit and z jog
-for ax,bx,zz in [(x_a,x_b,1.10),(x_b,x_c,1.10),(x_c,x_d,.74),(x_d,room_x0-.10,.74)]:
-    if bx<=ax:continue
-    box((ax+bx)/2,yc,zz,bx-ax,.29,.34,'#12223b')
-    box((ax+bx)/2,yc+.05,zz+.15,bx-ax,.09,.06,'#51ff65',True)
-    box((ax+bx)/2,yc-.065,zz+.168,bx-ax,.045,.052,'#79fca7',True)
-# two short Z-wise bends
-box(x_c,yc,(1.10+.74)/2,.27,.30,.49,'#1c3050')
-box(x_c,yc+.04,(1.10+.74)/2,.09,.09,.47,'#57ff70',True)
-for cx,cz in [(x_b,1.1),(x_c,1.1),(x_c,.74),(x_d,.74)]:
-    box(cx,yc,cz,.30,.33,.36,'#3d537a')
-    box(cx,yc+.12,cz,.16,.07,.16,'#4fff85',True)
-# wall socket on exterior x-negative wall
-box(room_x0-.16,yc,.74,.30,.52,.57,'#1b2d4b')
-box(room_x0-.32,yc,.74,.039,.33,.37,'#50fc79',True)
-# visible passage hidden behind wall from rack to socket (nothing on indoor side)
+# --- PHYSICAL DATA LINK: LOWEST RACK SHELF -> WALL -> MONITOR BACK ---
+CHAIR_ACTIVE=False
+ROOM_GEOMETRY=False
+yc=.727
+SIGNAL_PATH=[
+    [rx+1.37,yc,.20],[-2.20,yc,.20],[-2.20,yc,3.72],
+    [room_x0+.30,yc,3.72],[room_x0+.30,yc,2.80],
+    [room_x0+.30,yc,mz],[room_x0+.30,1.60,mz],
+    [mx-.13,1.60,mz],[mx-.13,1.98,mz],
+]
+# The plug overlaps the bottom unit's front panel, not the rack side or empty space.
+RACK_ACTIVE=True
+box(rx+1.43,yc,.20,.19,.23,.32,'#142d25')
+surface_x(rx+1.535,yc,.20,.25,.16,'#59ff89',True)
+RACK_ACTIVE=False
+distance=0.0
+for start,end in zip(SIGNAL_PATH,SIGNAL_PATH[1:]):
+    axis=next(i for i in range(3) if start[i]!=end[i])
+    length=abs(end[axis]-start[axis]); direction=1 if end[axis]>start[axis] else -1
+    center=[(a+b)/2 for a,b in zip(start,end)]
+    dims=[.17,.17,.17];dims[axis]=length+.01
+    box(*center,*dims,'#182e35')
+    # Two inset luminous tracks keep the cable readable in the fixed isometric view.
+    sampler=lambda p,a=axis,s=start[axis],d=distance,k=direction,l=length: d+max(0,min(l,(p[a]-s)*k))
+    for face in (1,2):
+        if face==axis:continue
+        track_center=center.copy();track_center[face]+=.091
+        track_dims=[.085,.085,.085];track_dims[axis]=length+.015;track_dims[face]=.04
+        box(*track_center,*track_dims,'#16352e',True,signal=sampler)
+    distance+=length
+    box(*end,.205,.205,.205,'#35534c')
+    box(end[0],end[1]+.112,end[2],.12,.026,.12,'#16352e',True,signal=lambda p,d=distance:d)
+SIGNAL_LENGTH=distance
+# Cable wraps around the cutaway wall end, without piercing or glowing through it.
+box(room_x0+.30,yc,room_z1+.17,.29,.29,.14,'#304951')
+box(mx-.13,1.99,mz,.16,.13,.23,'#1c3545')
 
 # --- Render / standard glTF2 asset export ---
 def prepare(collection):
@@ -354,6 +400,11 @@ for prim_idx,collection in enumerate(COLLECTIONS):
     attrs['POSITION']=add_accessor(pack_array(pos.tobytes(),34962),5126,len(pos),'VEC3',min=pos.min(axis=0).tolist(),max=pos.max(axis=0).tolist())
     attrs['NORMAL']=add_accessor(pack_array(nor.tobytes(),34962),5126,len(nor),'VEC3')
     attrs['COLOR_0']=add_accessor(pack_array(col.tobytes(),34962),5121,len(col),'VEC4',normalized=True)
+    attrs['_SIGNAL']=add_accessor(pack_array(np.asarray(collection['signal'],dtype=np.float32).tobytes(),34962),5126,len(pos),'SCALAR')
+    attrs['_RACK']=add_accessor(pack_array(np.asarray(collection['rack'],dtype=np.float32).tobytes(),34962),5126,len(pos),'SCALAR')
+    attrs['_ROOM']=add_accessor(pack_array(np.asarray(collection['room'],dtype=np.float32).tobytes(),34962),5126,len(pos),'SCALAR')
+    attrs['_BUTTON']=add_accessor(pack_array(np.asarray(collection['button'],dtype=np.float32).tobytes(),34962),5126,len(pos),'SCALAR')
+    attrs['_CHAIR']=add_accessor(pack_array(np.asarray(collection['chair'],dtype=np.float32).tobytes(),34962),5126,len(pos),'SCALAR')
     idx_accessor=add_accessor(pack_array(ind.tobytes(),34963),5125,len(ind),'SCALAR')
     mesh_primitives.append({'attributes':attrs,'indices':idx_accessor,'material':prim_idx,'mode':4})
     print(('Opaque' if prim_idx==0 else 'Emissive'),len(pos),'vertices,',len(ind)//3,'triangles')
@@ -361,6 +412,7 @@ for prim_idx,collection in enumerate(COLLECTIONS):
 payload=b''.join(data_parts);payload+=b'\0'*((-len(payload))%4)
 model={
  'asset':{'version':'2.0','generator':'JP Voxel Room / pure 3D geometry generator'},
+ 'extras':{'signalPath':SIGNAL_PATH,'signalLength':SIGNAL_LENGTH,'wallNeon':WALL_NEON},
  'scene':0,'scenes':[{'nodes':[0]}],
  'nodes':[{'mesh':0,'name':'Server rack + office room / isometric'}],
  'meshes':[{'name':'Procedural voxel server and workspace', 'primitives':mesh_primitives}],
@@ -375,5 +427,5 @@ glb=struct.pack('<III',0x46546C67,2,12+8+len(js)+8+len(payload))
 glb+=struct.pack('<II',len(js),0x4E4F534A)+js
 glb+=struct.pack('<II',len(payload),0x004E4942)+payload
 (ROOT/'room-server.glb').write_bytes(glb)
-(ROOT/'scene-description.json').write_text(json.dumps({'name':'Server rack + one room (geometry fixes v1.1)','description':'Procedurally generated full 3D voxel model (not an image). Static orthographic render. Two back walls; desk and monitor against the left wall, empty right wall. External illuminated cables meet the exterior wall.','room_walls':2,'camera':'fixed isometric','interactive':False,'geometry_revision':'1.1','objects':BOX_COUNTER,'vertices':sum(len(c['pos']) for c in COLLECTIONS),'triangles':sum(len(c['idx'])//3 for c in COLLECTIONS)},indent=2))
+(ROOT/'scene-description.json').write_text(json.dumps({'name':'Server rack + one room (data link v1.2)','description':'Full 3D voxel scene. Navy-purple cabinet with green light accents, bottom-shelf data cable physically connected to the monitor. Green outbound and blue inbound pulses; only rack light accents and the visible crystal face blink blue on receipt; overhead lamp, monitor lettering, ASCI ART wall neon and floor perimeter LEDs blink green on computer receipt. Opaque walls occlude the glow.','room_walls':2,'camera':'fixed isometric','interactive':True,'animated':True,'geometry_revision':'1.2','signal_path':SIGNAL_PATH,'signal_length':SIGNAL_LENGTH,'objects':BOX_COUNTER,'vertices':sum(len(c['pos']) for c in COLLECTIONS),'triangles':sum(len(c['idx'])//3 for c in COLLECTIONS)},indent=2))
 print('Generated boxes:',BOX_COUNTER,'model bytes:',len(glb))

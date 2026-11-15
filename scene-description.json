@@ -1,11 +1,60 @@
 {
-  "name": "Server rack + one room (geometry fixes v1.1)",
-  "description": "Procedurally generated full 3D voxel model (not an image). Static orthographic render. Two back walls; desk and monitor against the left wall, empty right wall. External illuminated cables meet the exterior wall.",
+  "name": "Server rack + one room (data link v1.2)",
+  "description": "Full 3D voxel scene. Navy-purple cabinet with green light accents, bottom-shelf data cable physically connected to the monitor. Green outbound and blue inbound pulses; only rack light accents and the visible crystal face blink blue on receipt; overhead lamp, monitor lettering, ASCI ART wall neon and floor perimeter LEDs blink green on computer receipt. Opaque walls occlude the glow.",
   "room_walls": 2,
   "camera": "fixed isometric",
-  "interactive": false,
-  "geometry_revision": "1.1",
-  "objects": 529,
-  "vertices": 12696,
-  "triangles": 6348
+  "interactive": true,
+  "animated": true,
+  "geometry_revision": "1.2",
+  "signal_path": [
+    [
+      -3.4299999999999997,
+      0.727,
+      0.2
+    ],
+    [
+      -2.2,
+      0.727,
+      0.2
+    ],
+    [
+      -2.2,
+      0.727,
+      3.72
+    ],
+    [
+      1.54,
+      0.727,
+      3.72
+    ],
+    [
+      1.54,
+      0.727,
+      2.8
+    ],
+    [
+      1.54,
+      0.727,
+      -0.51
+    ],
+    [
+      1.54,
+      1.6,
+      -0.51
+    ],
+    [
+      1.9,
+      1.6,
+      -0.51
+    ],
+    [
+      1.9,
+      1.98,
+      -0.51
+    ]
+  ],
+  "signal_length": 14.332999999999998,
+  "objects": 633,
+  "vertices": 15192,
+  "triangles": 7596
 }

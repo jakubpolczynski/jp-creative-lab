@@ -16,6 +16,75 @@
     body { font-family:system-ui,sans-serif; }
     .stage { position:fixed;inset:0; width:100vw; height:100dvh; background:radial-gradient(ellipse 78% 74% at 52% 49%,#ffffff 15%,#f8f9fc 100%); overflow:hidden; }
     #scene {display:block;width:100%;height:100%;outline:none;pointer-events:none;touch-action:auto;}
+    #room-button {position:fixed;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;color:transparent;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;clip-path:polygon(0 0,0 0,0 0);outline:none;}
+    #room-focus {position:fixed;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+    #room-focus polygon {fill:none;stroke:#9cfaff;stroke-width:2;stroke-linejoin:round;opacity:0;}
+    #room-button:focus-visible + #room-focus polygon {opacity:.9;}
+    #monitor-app {position:fixed;display:flex;flex-direction:column;overflow:hidden;background:#0b1225;color:#d9f6ff;border:1px solid #66d9ed;font-family:ui-monospace,monospace;opacity:0;visibility:hidden;pointer-events:none;}
+    #monitor-app[data-open="true"] {opacity:1;visibility:visible;pointer-events:auto;}
+    .monitor-toolbar {display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px;border-bottom:1px solid #294157;}
+    #monitor-back {min-height:44px;padding:8px 16px;background:#102b39;border:1px solid #58dbdb;color:#bbffff;font:inherit;cursor:pointer;}
+    #monitor-back:hover {background:#1a454e;}
+    #monitor-back:focus-visible {outline:3px solid #a5ffff;outline-offset:2px;}
+    #monitor-content {flex:1;min-height:0;overflow:auto;padding:0;container:monitor / inline-size;}
+    #monitor-content h1 {font-size:clamp(16px,3vw,32px);font-weight:500;margin:0 0 16px;}
+    #monitor-content p {font-size:clamp(11px,1.4vw,16px);color:#9fb9c8;line-height:1.6;max-width:50ch;}
+    #monitor-content {padding:0;}
+    #ascii-converter {min-height:100%;padding:20px;display:flex;flex-direction:column;gap:14px;}
+    .ascii-heading {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    #ascii-format {min-height:44px;padding:8px;color:#d3fcff;background:#153442;border:1px solid #5ad3dc;font:12px ui-monospace,monospace;}
+    #ascii-format:focus-visible {outline:3px solid #aeffff;outline-offset:3px;}
+    #ascii-converter h1 {font-size:18px;margin:0;}
+    #ascii-drop {display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;min-height:128px;padding:20px 12px;border:1px dashed #3f7081;background:#0e1c2e;text-align:center;}
+    #ascii-drop[data-drag="true"] {border-color:#6ef4b4;background:#123c37;}
+    #ascii-drop p {margin:0;font-size:13px;}
+    #ascii-file {position:absolute;width:1px;height:1px;opacity:0;}
+    .ascii-file-label,#ascii-download,#ascii-paste {display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 16px;border:1px solid #5ad3dc;color:#d3fcff;background:#153442;font:12px ui-monospace,monospace;text-decoration:none;cursor:pointer;}
+    #ascii-download {display:none!important;}
+    .ascii-input-actions {display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
+    .ascii-file-label:hover,#ascii-download:hover,#ascii-paste:hover {background:#235360;}
+    #ascii-paste:focus-visible {outline:3px solid #aeffff;outline-offset:3px;}
+    #ascii-file:focus-visible + .ascii-file-label,#ascii-download:focus-visible {outline:3px solid #aeffff;outline-offset:3px;}
+    #ascii-status {font-size:11px;color:#9ab9c9;min-height:16px;}
+    #ascii-status:empty {display:none;}
+    #ascii-converter[data-state="error"] #ascii-status {color:#ffb2a9;}
+    #ascii-preview {margin:0;padding:12px 0;background:#f8fafc;color:#111827;font-family:'Courier New',monospace;line-height:1.2;letter-spacing:0;font-weight:400;white-space:pre;overflow:auto;tab-size:1;font-variant-ligatures:none;}
+    #ascii-converter[data-state="ready"] #ascii-drop {min-height:44px;padding:0;border:0;background:none;align-items:flex-start;}
+    #ascii-converter[data-state="ready"] #ascii-drop p {display:none;}
+    #ascii-converter[data-state="ready"] .ascii-controls {display:flex;align-items:flex-start;gap:8px;overflow-x:auto;padding:3px; margin:-3px;}
+    #ascii-converter[data-state="ready"] .ascii-controls > * {flex:0 0 auto;}
+    #ascii-converter[data-state="ready"] .ascii-input-actions,
+    #ascii-converter[data-state="ready"] .ascii-heading {flex-wrap:nowrap;}
+    #ascii-converter[data-state="ready"] .ascii-file-label,
+    #ascii-converter[data-state="ready"] #ascii-paste,
+    #ascii-converter[data-state="ready"] #ascii-download,
+    #ascii-converter[data-state="ready"] #ascii-format {font-size:11px;padding:8px;white-space:nowrap;}
+    #ascii-converter[data-state="ready"] #ascii-format {width:108px;}
+    #ascii-remix,#remix-reset {min-height:44px;padding:8px;border:1px solid #5ad3dc;background:#153442;color:#d3fcff;font:11px ui-monospace,monospace;white-space:nowrap;cursor:pointer;}
+    #ascii-remix[aria-expanded="true"] {background:#235360;}
+    #ascii-remix:focus-visible,#remix-reset:focus-visible {outline:3px solid #aeffff;outline-offset:3px;}
+    #ascii-remix-panel {border:1px solid #294e62;background:#0e1c2e;padding:12px;}
+    .remix-top {display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+    .remix-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;}
+    .remix-grid label,.remix-top label {font-size:12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:#c9e1e9;min-width:0;}
+    .remix-grid input[type="range"] {width:100%;margin:0;accent-color:#6fe0cf;min-height:28px;}
+    .remix-grid output {margin-left:auto;color:#83dccc;font-size:11px;}
+    .remix-grid select,.remix-top select,.remix-grid input[type="text"] {width:100%;min-width:0;min-height:36px;border:1px solid #3f7081;color:#d3fcff;background:#102b39;padding:6px;font:12px ui-monospace,monospace;}
+    .remix-top select {width:auto;max-width:170px;}
+    .remix-grid input[type="color"] {width:48px;height:36px;border:1px solid #3f7081;background:none;}
+    .remix-grid input[type="checkbox"] {accent-color:#6fe0cf;width:18px;height:18px;}
+    .remix-grid input:focus-visible,.remix-grid select:focus-visible,.remix-top select:focus-visible {outline:2px solid #aeffff;outline-offset:2px;}
+    @container monitor (min-width:500px){
+      #ascii-converter:has(#ascii-remix-panel:not([hidden])) {display:grid;grid-template-columns:minmax(190px,.8fr) minmax(0,1.2fr);align-content:start;align-items:start;}
+      #ascii-converter:has(#ascii-remix-panel:not([hidden])) .ascii-controls {grid-column:1/-1;}
+      #ascii-converter:has(#ascii-remix-panel:not([hidden])) #ascii-remix-panel {grid-row:2;grid-column:1;max-height:360px;overflow:auto;}
+      #ascii-converter:has(#ascii-remix-panel:not([hidden])) #ascii-preview {grid-row:2;grid-column:2;}
+      #ascii-converter:has(#ascii-remix-panel:not([hidden])) #ascii-status {grid-column:1/-1;}
+      .remix-grid {grid-template-columns:minmax(0,1fr);}
+      .remix-top {flex-wrap:wrap;}
+    }
+    @media(max-width:600px){#monitor-content{padding:0}#ascii-converter{padding:10px;gap:8px}#ascii-converter h1{font-size:14px}#ascii-drop{min-height:108px;padding:12px 8px}#ascii-drop p{font-size:11px}.ascii-file-label,#ascii-download,#ascii-paste{padding:7px 10px;font-size:11px}}
+    @media(max-width:600px){.monitor-toolbar {padding:6px;gap:6px}.monitor-toolbar span{display:none}#monitor-back{min-height:44px;padding:6px 10px;font-size:12px}#monitor-content{padding:0}#monitor-content h1{margin-bottom:6px}#monitor-content p{margin:0}}
     .sr-only { position:absolute!important; width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important; }
     .error {position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:14px/1.5 ui-monospace,monospace;text-align:center;color:#25324a;max-width:360px;padding:22px;}
     [hidden] {display:none!important;}
@@ -23,11 +92,49 @@
   </style>
 </head>
 <body>
-  <main class="stage" aria-label="Statyczna scena 3D — serwer rack i połączone pomieszczenie">
-    <canvas id="scene" aria-label="Prawdziwy izometryczny model 3D: po lewej wolnostojący rack serwerowy z neonowym zielonym rdzeniem; po prawej pokój z dwiema ścianami, biurkiem i monitorem przy lewej ścianie. Kable serwera wchodzą za zewnętrzną ścianę pokoju. Nie ma aktywnych kontrolek."></canvas>
-    <p class="sr-only">Izometryczna scena 3D w stylu voxel art. Wolnostojący rack serwerowy połączony z jednym pokojem. W pokoju biurko z monitorem, klawiaturą, lampą, rośliną i krzesłem. Na ścianach nie ma napisów. Model jest celowo nieinteraktywny.</p>
+  <main class="stage" aria-label="Scena 3D — serwer rack z dwukierunkową transmisją danych">
+    <canvas id="scene" aria-label="Granatowo-fioletowy rack z zielonymi akcentami świetlnymi, połączony kablem z najniższej półki do komputera w pokoju. Zielony impuls biegnie do komputera, niebieski wraca do serwera. Po odbiorze danych przez komputer lampa nad biurkiem, napis na monitorze, neon ASCI ART na ścianie i LED przy podłodze na chwilę stają się zielone. Po powrocie sygnału do serwera jego akcenty i cały kryształ migają na niebiesko; obudowa zachowuje swój kolor."></canvas>
+    <button id="room-button" type="button" aria-label="Otwórz aplikację na monitorze" aria-controls="monitor-app" aria-expanded="false" aria-describedby="room-help" disabled></button>
+    <svg id="room-focus" aria-hidden="true"><polygon points=""/></svg>
+    <p id="room-help" class="sr-only">Kliknij pokój, aby przybliżyć monitor. Powrót przyciskiem na ekranie monitora lub Escape. Klawiatura: Enter lub spacja.</p>
+    <section id="monitor-app" role="region" aria-label="Aplikacja na monitorze" aria-hidden="true" inert data-open="false">
+      <header class="monitor-toolbar"><button id="monitor-back" type="button">← Wróć do pokoju</button></header>
+      <div id="monitor-content" tabindex="-1">
+        <section id="ascii-converter" aria-label="Konwerter obrazu na ASCII" data-state="empty">
+          <div class="ascii-controls">
+          <div id="ascii-drop">
+            <p>Przeciągnij obraz tutaj lub</p>
+            <div class="ascii-input-actions"><div><input id="ascii-file" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif,image/bmp,image/avif"><label class="ascii-file-label" for="ascii-file">Wybierz plik</label></div><button id="ascii-paste" type="button">Wklej ze schowka</button></div>
+            <p>lub wklej obraz: Ctrl + V</p>
+            <p>PNG · JPG · SVG · WebP · do 20 MB</p>
+          </div>
+          <div id="ascii-exports" class="ascii-heading" hidden><select id="ascii-format" aria-label="Format pobierania"><option value="html">HTML — kolorowe</option><option value="png">PNG — kolorowe</option><option value="jpg">JPG — kolorowe</option><option value="txt">TXT — sam tekst</option></select><a id="ascii-download" hidden>Pobierz .html</a></div>
+          <button id="ascii-remix" type="button" aria-expanded="false" aria-controls="ascii-remix-panel" hidden>Remixuj</button>
+          </div>
+          <section id="ascii-remix-panel" aria-label="Remiks obrazu ASCII" hidden>
+            <div class="remix-top"><label>Styl <select id="remix-preset"><option value="original">Oryginał</option><option value="detail">Więcej detali</option><option value="matrix">Matrix</option><option value="amber">Bursztyn</option><option value="outline">Kontury</option><option value="custom" disabled>Własny</option></select></label><button id="remix-reset" type="button">Resetuj</button></div>
+            <div class="remix-grid">
+              <label>Szczegółowość <output for="remix-width">120</output><input id="remix-width" data-remix="width" type="range" min="40" max="240" step="10" value="120"></label>
+              <label>Jasność <output for="remix-brightness">0</output><input id="remix-brightness" data-remix="brightness" type="range" min="-100" max="100" value="0"></label>
+              <label>Kontrast <output for="remix-contrast">1</output><input id="remix-contrast" data-remix="contrast" type="range" min="0.3" max="2.5" step="0.05" value="1"></label>
+              <label>Nasycenie <output for="remix-saturation">1</output><input id="remix-saturation" data-remix="saturation" type="range" min="0" max="2" step="0.05" value="1"></label>
+              <label>Kontury <output for="remix-edges">0</output><input id="remix-edges" data-remix="edges" type="range" min="0" max="100" value="0"></label>
+              <label>Rozciągnięcie w pionie <output for="remix-stretch">1</output><input id="remix-stretch" data-remix="stretch" type="range" min="0.5" max="2" step="0.05" value="1"></label>
+              <label>Paleta <select id="remix-palette" data-remix="palette"><option value="color">Kolory obrazu</option><option value="mono">Czarno-białe</option><option value="matrix">Matrix</option><option value="amber">Bursztyn</option></select></label>
+              <label>Znaki <input id="remix-ramp" data-remix="ramp" type="text" value="@%#*+=-:. " maxlength="40" spellcheck="false"></label>
+              <label><input id="remix-invert" data-remix="invert" type="checkbox">Odwróć jasność</label>
+              <label>Tło <input id="remix-background" data-remix="background" type="color" value="#f8fafc"></label>
+            </div>
+          </section>
+          <div id="ascii-status" role="status" aria-live="polite"></div>
+          <pre id="ascii-preview" aria-label="Podgląd ASCII" tabindex="0" hidden></pre>
+        </section>
+      </div>
+    </section>
+    <p class="sr-only">Izometryczna scena 3D w stylu voxel art. Kabel wychodzi z dolnej półki serwera, omija zakończenie ściany i dochodzi do monitora. Co dziesięć sekund następuje wymiana zielonego i niebieskiego impulsu. Ograniczenie ruchu w ustawieniach systemowych wyłącza animację. Kamera zaczyna w widoku izometrycznym. Kliknięcie pokoju odsuwa i obraca krzesło w lewo oraz przybliża monitor; przycisk na jego ekranie lub Escape przywraca pokój i krzesło.</p>
     <div id="status" class="error" role="status" aria-live="polite">Wczytywanie modelu 3D…</div>
   </main>
-  <script type="module" src="/viewer.8286579392e8.js"></script>
+  <script type="module" src="/viewer.3f202608f649.js"></script>
+  <script type="module" src="/ascii.js?v=remix-4"></script>
 </body>
 </html>
