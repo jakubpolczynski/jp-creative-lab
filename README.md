@@ -1,17 +1,48 @@
-# JP Creative Lab — izometryczny pokój 3D (v1.2)
+# JP Creative Lab — interaktywny świat 3D
 
-Prototyp GLB: granatowo-fioletowy rack z zielonymi akcentami świetlnymi, kabel z dolnej półki do monitora, biurko, klawiatura, mysz i fotel. Kamera startuje w nieruchomym widoku izometrycznym; kliknięcie pokoju przybliża ekran monitora i ustawia go na wprost. Co 10 sekund zielony impuls biegnie do komputera, niebieski wraca i wyzwala krótki niebieski blink wyłącznie akcentów świetlnych; kolor obudowy pozostaje bez zmian. Kryształ ma świecącą powierzchnię, która również miga na niebiesko. Po dotarciu zielonego impulsu do komputera lampa nad biurkiem, napis i narożniki na monitorze, neon `ASCI ART` na tylnej ścianie oraz LED przy podłodze na krótko zmieniają kolor z cyjanu na zielony. Kabel omija zakończenie ściany zamiast przez nią prześwitywać. Animacja respektuje ograniczenie ruchu, zatrzymuje się w niewidocznej karcie i działa maksymalnie w 30 klatkach/s.
+Portfolio i creative lab: pięć pokoi połączonych kablami z serwerem.
+Nowe pokoje to **galeria projektów**, **cząsteczki 3D**, **studio materiałów GLSL**
+i **sekwencer Web Audio**. Kliknij wyspę albo wybierz ją z dolnego paska.
+Powrót przyciskiem lub Escape. Dźwięk wymaga Start i zatrzymuje się po wyjściu.
+Każdy pokój przybliża **monitor komputera**, tak jak ASCII. Cały projekt,
+jego podgląd i sterowanie działają wewnątrz fizycznego ekranu, nie w bocznym panelu.
+Szczegóły, uruchamianie testów i dowody: [docs/four-rooms.md](docs/four-rooms.md).
+
+Granatowo-fioletowy rack i pięć oddzielonych wysp z biurkami oraz komputerami.
+Pokoje można teraz przenosić: przytrzymaj przez 350 ms, przeciągnij i puść.
+Kable są giętkimi sznurkami z kolizjami, podpiętymi do własnych półek racka
+i tyłów monitorów. Same wyznaczają drogę i wydłużają się bez limitu.
+Krótki klik nadal otwiera aplikację; Escape anuluje przenoszenie.
+Szczegóły i skróty klawiatury: [giętkie kable](docs/flexible-cables.md).
+Wszystkie pokoje, również ASCII, mają ten sam model, proporcje i oświetlenie.
+ASCII zachowuje cyjan i konwerter; jego kabel łączy najniższą półkę racka
+z tyłem monitora, omijając przeszkody tak samo jak pozostałe przewody.
+Serwer wysyła zielone wiązki, a pokoje odpowiadają własnym kolorem: ASCII
+cyjanowym, galeria czerwonym, cząsteczki różowym, materiały bursztynowym,
+dźwięk fioletowym. Każda wiązka porusza się z prędkością 5 jednostek sceny/s;
+światła odbiorcy rozbłyskują dopiero po dotarciu sygnału. Obudowy zachowują
+swój kolor. Trasy kabli omijają ściany i kończą się z tyłu monitorów.
+Animacja respektuje ograniczenie ruchu, pauzuje w niewidocznej karcie
+i działa maksymalnie w 30 klatkach/s.
 
 ## Aktualizacja pamięci podręcznej
 
 Poprzednia wersja używała niezmiennego adresu `room-server.glb`, z rocznym cache i `force-cache`. To mogło powodować wyświetlanie starego modelu po kolejnych wdrożeniach.
 
-W tym wydaniu model ma nazwę opartą na SHA-1: `room-server.44b95fcd4e41.glb`. Kod renderera to `viewer.3f202608f649.js`. Strona główna wymaga rewalidacji. Przy każdej przyszłej zmianie GLB **wygeneruj nową nazwę na podstawie jego zawartości**.
+W tym wydaniu model ma nazwę opartą na SHA-1: `room-server.44b95fcd4e41.glb`. Kod renderera to `viewer.606ceb00e1e1.js`. Strona główna wymaga rewalidacji. Przy każdej przyszłej zmianie GLB **wygeneruj nową nazwę na podstawie jego zawartości**.
+Pełny świat używa z GLB wyłącznie racka; wszystkie pięć pokoi i ich kable
+powstają ze wspólnego modelu proceduralnego. Stary pokój i kabel z GLB
+nie są rysowane ani w kolorze, ani w przebiegu bloom. Plik GLB nie został zmieniony.
 
 ## Pliki produkcyjne
 
 - `index.html` — pojedynczy ekran.
-- `viewer.3f202608f649.js` — własny WebGL2 renderer z animacją.
+- `viewer.606ceb00e1e1.js` — własny WebGL2 renderer z animacją.
+- `scene-geometry.js` — wybór części racka bez starego pokoju i kabla z GLB.
+- `rooms.js`, `room-world.js` — wspólny rejestr, kamery i proceduralne wyspy z kablami.
+- `lab-renderer.js`, `lab-particles.js` — efekty w tym samym kontekście WebGL2.
+- `lab-ui.js`, `lab.css` — dostępne sterowanie pokojami.
+- `projects.js`, `lab-audio.js` — prawdziwe case study i lokalny sekwencer.
 - `signals.js` — deterministyczny harmonogram impulsów i blinka.
 - `room-server.44b95fcd4e41.glb` — mesh GLB, 824316 B, z dystansem kabla `_SIGNAL`, maską akcentów racka `_RACK`, odbiornika `_ROOM` i ruchu pokoju `_BUTTON` oraz krzesła `_CHAIR`.
 - `favicon.svg` i `vercel.json`.
@@ -54,6 +85,25 @@ Po kliknięciu pokoju krzesło płynnie obraca się w lewo i jednocześnie odje�
 - `monitor.js` — czas przejścia, choreografia krzesła i proporcje ekranu.
 - `node tests/monitor.test.mjs` — przejście, proporcje, desktop/telefon.
 - `http://localhost:8000/tests/monitor.html` — przejście, aktywny HTML, przycisk powrotu i Escape.
+
+## Kontakt na serwerze
+
+Serwer rack jest drugim przyciskiem sceny: reaguje na najazd i wciśnięcie,
+a po kliknięciu kamera przybliża panel **[JP]** serwera. Formularz z imieniem, adresem email
+i wiadomością jest wkomponowany w powierzchnię serwera. Powrót przyciskiem
+„Wróć do sceny” lub Escape przywraca widok i fokus serwera. Pokój i konwerter
+ASCII działają niezależnie. Klawiatura, dotyk i ograniczenie ruchu są obsługiwane.
+
+Wysyłanie obsługuje Web3Forms. Aby je włączyć, zweryfikuj adres odbiorcy w usłudze
+i wpisz publiczny klucz formularza w `contact-config.js`. Bez klucza wysyłanie
+jest jawnie wyłączone; strona nie udaje pomyślnej wysyłki.
+
+- `server.js` — powierzchnia frontu, obrys i dopasowanie HTML.
+- `contact.js` i `contact-config.js` — walidacja, stan i konfiguracja wysyłki.
+- `node tests/server.test.mjs` i `node tests/contact.test.mjs`.
+- `http://localhost:8000/tests/server.html` — przejścia i obsługa kontaktu.
+- `http://localhost:8000/tests/contact.html` — walidacja i atrapy wysyłki.
+- Szczegóły konfiguracji, prywatności i ograniczeń: `docs/contact.md`.
 
 ## Regenerowanie
 

@@ -4,11 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="theme-color" content="#f8f9fc"/>
-  <meta name="description" content="JP Creative Lab — prototyp prawdziwej sceny 3D: serwer rack i jedno połączone pomieszczenie voxel art."/>
-  <meta property="og:title" content="JP Creative Lab — Voxel 3D Prototype"/>
-  <meta property="og:description" content="Prawdziwy model 3D w izometrycznym stylu voxel art. Jeden serwer i jedno pomieszczenie."/>
-  <title>JP Creative Lab · 3D Voxel Prototype</title>
+  <meta name="description" content="JP Creative Lab — interaktywne portfolio 3D. Odkrywaj ASCII, cząsteczki, materiały i dźwięk w jednym świecie voxel."/>
+  <meta property="og:title" content="JP Creative Lab — interaktywny świat 3D"/>
+  <meta property="og:description" content="Jeden świat, pięć pokoi i serwer. Interaktywne eksperymenty z grafiką i dźwiękiem."/>
+  <title>JP Creative Lab · interaktywny świat 3D</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="stylesheet" href="/lab.css"/>
   <style>
     :root { color-scheme: light; }
     *,*::before,*::after { box-sizing: border-box; }
@@ -16,10 +17,12 @@
     body { font-family:system-ui,sans-serif; }
     .stage { position:fixed;inset:0; width:100vw; height:100dvh; background:radial-gradient(ellipse 78% 74% at 52% 49%,#ffffff 15%,#f8f9fc 100%); overflow:hidden; }
     #scene {display:block;width:100%;height:100%;outline:none;pointer-events:none;touch-action:auto;}
-    #room-button {position:fixed;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;color:transparent;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;clip-path:polygon(0 0,0 0,0 0);outline:none;}
-    #room-focus {position:fixed;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
-    #room-focus polygon {fill:none;stroke:#9cfaff;stroke-width:2;stroke-linejoin:round;opacity:0;}
+    #room-button,#server-button {position:fixed;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;color:transparent;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;clip-path:polygon(0 0,0 0,0 0);outline:none;}
+    #room-focus,#server-focus {position:fixed;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+    #room-focus polygon,#server-focus polygon {fill:none;stroke:#9cfaff;stroke-width:2;stroke-linejoin:round;opacity:0;}
     #room-button:focus-visible + #room-focus polygon {opacity:.9;}
+    #server-focus polygon {stroke:#8cffba;}
+    #server-button:focus-visible + #server-focus polygon {opacity:.9;}
     #monitor-app {position:fixed;display:flex;flex-direction:column;overflow:hidden;background:#0b1225;color:#d9f6ff;border:1px solid #66d9ed;font-family:ui-monospace,monospace;opacity:0;visibility:hidden;pointer-events:none;}
     #monitor-app[data-open="true"] {opacity:1;visibility:visible;pointer-events:auto;}
     .monitor-toolbar {display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px;border-bottom:1px solid #294157;}
@@ -85,6 +88,35 @@
     }
     @media(max-width:600px){#monitor-content{padding:0}#ascii-converter{padding:10px;gap:8px}#ascii-converter h1{font-size:14px}#ascii-drop{min-height:108px;padding:12px 8px}#ascii-drop p{font-size:11px}.ascii-file-label,#ascii-download,#ascii-paste{padding:7px 10px;font-size:11px}}
     @media(max-width:600px){.monitor-toolbar {padding:6px;gap:6px}.monitor-toolbar span{display:none}#monitor-back{min-height:44px;padding:6px 10px;font-size:12px}#monitor-content{padding:0}#monitor-content h1{margin-bottom:6px}#monitor-content p{margin:0}}
+    #server-app {position:fixed;display:flex;flex-direction:column;overflow:hidden;background:#0a1619;color:#e2f9e9;border:1px solid #68de9b;font-family:ui-monospace,monospace;opacity:0;visibility:hidden;pointer-events:none;container:server / inline-size;}
+    #server-app[data-open="true"] {opacity:1;visibility:visible;pointer-events:auto;}
+    .server-toolbar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid #254537;background:#102322;}
+    #server-back {min-height:44px;padding:8px 10px;border:1px solid #427b5e;background:#132f29;color:#c4ffdb;font:11px ui-monospace,monospace;cursor:pointer;}
+    #server-back:hover {background:#204b3c;}
+    .server-indicator {display:flex;align-items:center;gap:6px;color:#8bcda6;font-size:10px;letter-spacing:.08em;}
+    .server-indicator::before {content:"";width:6px;height:6px;border-radius:50%;background:#84fcb0;box-shadow:0 0 9px #55ee8e;}
+    #server-scroll {flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:20px;scrollbar-color:#427b5e #102322;}
+    .contact-eyebrow {margin:0 0 8px;color:#8bcda6;font-size:10px;letter-spacing:.15em;}
+    #contact-title {margin:0 0 8px;font-size:clamp(18px,6cqi,26px);font-weight:500;letter-spacing:-.04em;}
+    .contact-intro {margin:0 0 20px;color:#a4bfaf;font-size:12px;line-height:1.6;}
+    #contact-form {display:grid;gap:12px;}
+    #contact-form fieldset {display:grid;gap:12px;min-width:0;margin:0;padding:0;border:0;}
+    #contact-form label {display:grid;gap:6px;font-size:11px;color:#baddc6;}
+    #contact-form input,#contact-form textarea {width:100%;min-width:0;min-height:44px;border:1px solid #335846;border-radius:0;background:#0c2020;color:#effff5;padding:10px;font:16px/1.4 ui-monospace,monospace;}
+    #contact-form input::placeholder,#contact-form textarea::placeholder {color:#6f9483;}
+    #contact-form textarea {min-height:100px;resize:vertical;}
+    #contact-form fieldset:disabled {opacity:.65;}
+    #contact-submit {min-height:46px;padding:10px;border:1px solid #8ce5aa;background:#83efaa;color:#092417;font:12px ui-monospace,monospace;font-weight:600;cursor:pointer;}
+    #contact-submit:hover:not(:disabled) {background:#b4ffcc;}
+    #contact-submit:disabled {opacity:.5;cursor:not-allowed;}
+    #contact-form :focus-visible,#server-back:focus-visible {outline:2px solid #b8ffd2;outline-offset:3px;}
+    #contact-status {margin:0;min-height:18px;color:#b5dfc4;font-size:12px;line-height:1.6;overflow-wrap:anywhere;}
+    #contact-form[data-state="error"] #contact-status {color:#ffbeb3;}
+    #contact-form[data-state="success"] #contact-status {color:#9bffc3;}
+    [data-contact-setup] {margin:0;padding:10px;border:1px solid #6c6941;background:#272a20;color:#e2dcb3;font-size:11px;line-height:1.6;}
+    .contact-privacy {margin:0;color:#8eaf9c;font-size:10px;line-height:1.6;}
+    .contact-privacy a {color:#c4ebd3;text-underline-offset:3px;}
+    @container server (max-width:300px){.server-toolbar {padding:6px}.server-indicator {display:none}#server-scroll {padding:14px}.contact-intro {margin-bottom:14px}#contact-form,#contact-form fieldset {gap:10px}}
     .sr-only { position:absolute!important; width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important; }
     .error {position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:14px/1.5 ui-monospace,monospace;text-align:center;color:#25324a;max-width:360px;padding:22px;}
     [hidden] {display:none!important;}
@@ -92,11 +124,14 @@
   </style>
 </head>
 <body>
-  <main class="stage" aria-label="Scena 3D — serwer rack z dwukierunkową transmisją danych">
-    <canvas id="scene" aria-label="Granatowo-fioletowy rack z zielonymi akcentami świetlnymi, połączony kablem z najniższej półki do komputera w pokoju. Zielony impuls biegnie do komputera, niebieski wraca do serwera. Po odbiorze danych przez komputer lampa nad biurkiem, napis na monitorze, neon ASCI ART na ścianie i LED przy podłodze na chwilę stają się zielone. Po powrocie sygnału do serwera jego akcenty i cały kryształ migają na niebiesko; obudowa zachowuje swój kolor."></canvas>
+  <main class="stage" aria-label="JP Creative Lab — pięć pokoi i serwer kontaktowy w jednym świecie 3D">
+    <canvas id="scene" aria-label="Pięć rozsuniętych pokoi voxel połączonych kablami z serwerem. Serwer wysyła zielone wiązki ze stałą prędkością. Pokoje odpowiadają własnym kolorem: ASCII cyjanowym, galeria czerwonym, cząsteczki różowym, materiały bursztynowym, dźwięk fioletowym. Światła pokoju i serwera rozbłyskują kolorem otrzymanej wiązki dopiero po jej dotarciu."></canvas>
     <button id="room-button" type="button" aria-label="Otwórz aplikację na monitorze" aria-controls="monitor-app" aria-expanded="false" aria-describedby="room-help" disabled></button>
     <svg id="room-focus" aria-hidden="true"><polygon points=""/></svg>
     <p id="room-help" class="sr-only">Kliknij pokój, aby przybliżyć monitor. Powrót przyciskiem na ekranie monitora lub Escape. Klawiatura: Enter lub spacja.</p>
+    <button id="server-button" type="button" aria-label="Otwórz formularz kontaktowy na serwerze" aria-controls="server-app" aria-expanded="false" aria-describedby="server-help" disabled></button>
+    <svg id="server-focus" aria-hidden="true"><polygon points=""/></svg>
+    <p id="server-help" class="sr-only">Kliknij serwer, aby przybliżyć panel z napisem JP i otworzyć formularz kontaktowy. Powrót przyciskiem lub Escape. Klawiatura: Enter lub spacja.</p>
     <section id="monitor-app" role="region" aria-label="Aplikacja na monitorze" aria-hidden="true" inert data-open="false">
       <header class="monitor-toolbar"><button id="monitor-back" type="button">← Wróć do pokoju</button></header>
       <div id="monitor-content" tabindex="-1">
@@ -131,10 +166,35 @@
         </section>
       </div>
     </section>
-    <p class="sr-only">Izometryczna scena 3D w stylu voxel art. Kabel wychodzi z dolnej półki serwera, omija zakończenie ściany i dochodzi do monitora. Co dziesięć sekund następuje wymiana zielonego i niebieskiego impulsu. Ograniczenie ruchu w ustawieniach systemowych wyłącza animację. Kamera zaczyna w widoku izometrycznym. Kliknięcie pokoju odsuwa i obraca krzesło w lewo oraz przybliża monitor; przycisk na jego ekranie lub Escape przywraca pokój i krzesło.</p>
+    <section id="server-app" role="region" aria-labelledby="contact-title" aria-hidden="true" inert data-open="false">
+      <header class="server-toolbar">
+        <button id="server-back" type="button">← Wróć do sceny</button>
+        <span class="server-indicator" aria-hidden="true">JP / CONNECT</span>
+      </header>
+      <div id="server-scroll">
+        <p class="contact-eyebrow">01 / KONTAKT</p>
+        <h1 id="contact-title">Porozmawiajmy<span aria-hidden="true">_</span></h1>
+        <p class="contact-intro">Masz pomysł, pytanie albo chcesz coś wspólnie stworzyć? Zostaw wiadomość.</p>
+        <form id="contact-form" aria-labelledby="contact-title" data-state="unconfigured">
+          <fieldset>
+            <legend class="sr-only">Twoja wiadomość</legend>
+            <label for="contact-name">Imię<input id="contact-name" name="name" autocomplete="name" maxlength="80" placeholder="Jak się do Ciebie zwracać?" required></label>
+            <label for="contact-email">Twój email<input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="ty@example.com" required></label>
+            <label for="contact-message">Wiadomość<textarea id="contact-message" name="message" rows="4" maxlength="5000" placeholder="Opowiedz o swoim pomyśle…" required></textarea></label>
+            <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+          </fieldset>
+          <p data-contact-setup>Wysyłanie wiadomości nie jest jeszcze uruchomione. Formularz czeka na konfigurację odbiorcy.</p>
+          <button id="contact-submit" type="submit" disabled>Wyślij wiadomość ↗</button>
+          <p id="contact-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
+          <p class="contact-privacy">Wysyłając, przekazujesz podane dane do Web3Forms w celu doręczenia wiadomości. Nie wpisuj danych wrażliwych. <a href="https://web3forms.com/privacy" target="_blank" rel="noopener noreferrer">Prywatność usługi ↗</a></p>
+        </form>
+      </div>
+    </section>
+    <p class="sr-only">Izometryczna scena 3D. Kable wychodzą z półek racka, omijają ściany i dochodzą do monitorów. Zielone wiązki serwera i kolorowe odpowiedzi pokoi mają tę samą prędkość; dłuższa trasa wymaga więcej czasu. Ograniczenie ruchu wyłącza animację. Kliknięcie pokoju odsuwa fotel i przybliża monitor z całym projektem; przycisk powrotu lub Escape przywraca świat.</p>
     <div id="status" class="error" role="status" aria-live="polite">Wczytywanie modelu 3D…</div>
   </main>
-  <script type="module" src="/viewer.3f202608f649.js"></script>
+  <script type="module" src="/viewer.606ceb00e1e1.js"></script>
   <script type="module" src="/ascii.js?v=remix-4"></script>
+  <script type="module" src="/contact.js"></script>
 </body>
 </html>

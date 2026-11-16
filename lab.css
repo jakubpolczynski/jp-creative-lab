@@ -1,0 +1,76 @@
+/* Quiet hardware controls around the living voxel scene. */
+.lab-room-button {position:fixed;inset:0;width:100%;height:100%;padding:0;border:0;background:none;clip-path:polygon(0 0,0 0,0 0);cursor:pointer;touch-action:manipulation;outline:none;-webkit-tap-highlight-color:transparent}
+.lab-room-button:disabled {pointer-events:none}
+.lab-outline {position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.lab-outline polygon {fill:none;stroke:var(--room-color);stroke-width:2;opacity:0;stroke-linejoin:round}
+.lab-room-button:focus-visible + .lab-outline polygon {opacity:1}
+.lab-label {position:fixed;transform:translate(-50%,0);pointer-events:none;font:11px/1.3 ui-monospace,monospace;color:#d7e0f1;white-space:nowrap;background:#10172be6;padding:5px 8px;border-left:3px solid var(--room-color)}
+#world-nav {position:fixed;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;max-width:calc(100% - 24px);overflow-x:auto;gap:4px;padding:5px;background:#10172bed;box-shadow:0 5px 28px #31345615;border:1px solid #344056;scrollbar-width:thin}
+#world-nav button {flex:0 0 auto;min-height:44px;padding:8px 13px;border:0;border-bottom:2px solid var(--room-color,#a6b2d9);background:transparent;color:#d7e0f1;font:12px ui-monospace,monospace;cursor:pointer}
+#world-nav button:hover {background:#26314c}
+#world-nav button:focus-visible {outline:2px solid #bfd3ff;outline-offset:-2px}
+#lab-surface {position:relative;width:100%;height:100%;min-width:0;min-height:0;touch-action:none}
+#lab-panel {--room-color:#60dfe8;position:fixed;display:flex;flex-direction:column;overflow:hidden;color:#e7edf6;border:1px solid var(--room-color);font:13px/1.65 ui-monospace,monospace;visibility:hidden;opacity:0;pointer-events:none;z-index:2;container:labmonitor / inline-size}
+#lab-panel[data-open="true"] {visibility:visible;opacity:1;pointer-events:auto}
+.lab-toolbar {display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #344056;padding:8px 12px;flex-shrink:0;background:#10172b}
+#lab-connection {font-size:10px;color:#a5b3c8}
+#lab-connection::before {content:"";display:inline-block;width:5px;height:5px;margin-right:6px;background:var(--room-color)}
+.lab-scroll {flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.lab-heading {padding:18px 22px;background:#10172b;flex-shrink:0}
+.lab-workspace {flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);overflow:hidden}
+.lab-controls {min-width:0;min-height:0;overflow:auto;padding:22px;background:#10172b;overscroll-behavior:contain;scrollbar-color:#56637f #10172b}
+#lab-panel[data-room="gallery"] .lab-workspace {grid-template-columns:minmax(0,1fr)}
+#lab-title {font-size:26px;line-height:1.2;font-weight:500;letter-spacing:-.055em;margin:0 0 8px}
+#lab-description {color:#a5b3c8;margin:0;font-size:12px}
+#lab-panel button {min-height:44px;border:1px solid #53617d;border-radius:0;color:#e7edf6;background:#1a2540;font:12px ui-monospace,monospace;padding:8px 12px;cursor:pointer}
+#lab-panel button:hover {background:#2c3954}
+#lab-panel button:disabled {opacity:.5;cursor:wait}
+#lab-panel :focus-visible {outline:2px solid var(--room-color);outline-offset:3px}
+#lab-panel a {color:var(--room-color);text-underline-offset:4px}
+#lab-back {white-space:nowrap}
+#lab-panel fieldset {border:0;padding:0;margin:0 0 22px;min-width:0}
+#lab-panel legend {padding:0;margin:0 0 10px;color:#bdc8dc;font-size:12px}
+.lab-options {display:flex;gap:5px}
+.lab-options button {flex:1;min-width:0;padding:8px!important}
+#lab-panel button[aria-pressed="true"] {border-color:var(--room-color);background:color-mix(in srgb,var(--room-color) 18%,#141d32);color:#fff}
+.lab-range {display:flex;flex-wrap:wrap;gap:8px;color:#bdc8dc;margin:20px 0}
+.lab-range output {margin-left:auto;font-size:11px;color:var(--room-color)}
+.lab-range input {width:100%;min-height:32px;margin:0;accent-color:var(--room-color);cursor:pointer}
+.lab-note {font-size:11px;color:#a5b3c8;line-height:1.8}
+.lab-reset {margin-top:8px}
+#project-select {display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;border-color:var(--room-color)!important}
+#project-select span {font-size:10px;color:#a5b3c8;margin-top:5px}
+#project-detail h2 {font-weight:500;font-size:20px;margin:24px 0 10px}
+#project-detail h3 {font-weight:500;font-size:12px;color:var(--room-color);margin:22px 0 8px}
+#project-detail p,#project-detail li {font-size:12px;color:#bdc8dc}
+#project-detail ul {padding-left:18px}
+#project-stack {font-size:10px!important;color:#a5b3c8!important}
+.sequence-row {display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin-bottom:12px}
+.sequence-row > span {grid-column:1/-1;color:#bdc8dc;font-size:12px}
+#lab-panel .sequence-row button {padding:0;min-width:0;min-height:44px;font-size:11px}
+.sequence-row button[data-current="true"] {box-shadow:inset 0 -4px var(--room-color)}
+.sound-transport {display:flex;gap:8px;margin:20px 0}
+#sound-start {flex:1;border-color:var(--room-color)!important}
+#lab-error {font-size:12px;color:#ffb7a7}
+@container labmonitor (max-width:600px){
+  .lab-heading {display:none}
+  .lab-toolbar {padding:5px 7px}
+  #lab-connection {max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+  #lab-connection::before {display:none}
+  #lab-panel button {font-size:10px;padding:7px}
+  .lab-controls {padding:10px}
+  .lab-options {flex-direction:column}
+  .lab-range {font-size:10px;gap:3px;margin:12px 0}
+  .lab-range output {font-size:10px}
+  #lab-panel legend {font-size:10px}
+  .lab-note {font-size:10px}
+  .sequence-row {grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+  .sound-transport {flex-wrap:wrap}
+  #sound-start {flex-basis:100%}
+}
+@media(max-width:699px){
+  #world-nav{bottom:max(10px,env(safe-area-inset-bottom));justify-content:flex-start;left:10px;right:10px;transform:none;max-width:none}
+  .lab-label{font-size:8px;padding:3px 5px}
+}
+.lab-room-button[data-dragging="true"],#room-button[data-dragging="true"]{cursor:grabbing!important}
+.lab-room-button[data-blocked="true"],#room-button[data-blocked="true"]{cursor:not-allowed!important}

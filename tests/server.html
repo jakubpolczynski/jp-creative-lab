@@ -1,0 +1,73 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>Server contact regression</title></head>
+<body><pre id="result">Test serwera…</pre><iframe title="Scena testowa" width="800" height="600"></iframe><script type="module">
+import {SERVER_SURFACE} from '/server.js';
+import {CONTACT_CONFIG} from '/contact-config.js';
+import {isContactConfigured} from '/contact.js';
+const results=[],check=(name,passed,details={})=>results.push({name,passed,...details});
+try{
+  const html=await(await fetch('/')).text();
+  const freeze=`<script>window.framesToRun=[];window.simTime=0;Object.defineProperty(performance,'now',{value:()=>window.simTime});window.requestAnimationFrame=cb=>{window.framesToRun.push(cb);return window.framesToRun.length};window.cancelAnimationFrame=()=>{};window.sceneMatrices=[];const writeMatrix=WebGL2RenderingContext.prototype.uniformMatrix4fv;WebGL2RenderingContext.prototype.uniformMatrix4fv=function(location,transpose,value){window.sceneMatrices.push(Array.from(value));if(window.sceneMatrices.length>2)window.sceneMatrices.shift();return writeMatrix.call(this,location,transpose,value)};<\/script>`;
+  const frame=document.querySelector('iframe');frame.srcdoc=html.replace('<head>','<head><base href="/">'+freeze);
+  for(let i=0;i<200;i++){
+    if(frame.contentDocument?.documentElement.dataset.render==='ready'&&frame.contentDocument.querySelector('#contact-form')?.dataset.ready==='true')break;
+    await new Promise(resolve=>setTimeout(resolve,30));
+  }
+  const w=frame.contentWindow,d=w.document,button=d.querySelector('#server-button'),room=d.querySelector('#room-button');
+  const app=d.querySelector('#server-app'),back=d.querySelector('#server-back'),form=d.querySelector('#contact-form');
+  if(d.documentElement.dataset.render!=='ready')throw Error('Renderer not ready');
+  const reduced=w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function tick(time){w.simTime=time;w.framesToRun.splice(0).forEach(cb=>cb(time))}
+  function project(point){
+    const [view,projection]=w.sceneMatrices;
+    const multiply=(matrix,vector)=>[0,1,2,3].map(row=>vector.reduce((sum,value,column)=>sum+matrix[column*4+row]*value,0));
+    const clip=multiply(projection,multiply(view,[...point,1]));
+    return {x:(clip[0]/clip[3]+1)*w.innerWidth/2,y:(1-clip[1]/clip[3])*w.innerHeight/2};
+  }
+  check('Contact starts hidden, inert and out of the tab order',app.inert&&app.dataset.open==='false'&&app.getAttribute('aria-hidden')==='true');
+  check('Both objects can be activated in overview',!button.disabled&&!room.disabled);
+  check('Server and room have different clickable hulls',button.style.clipPath!==room.style.clipPath);
+  const logoPoint=project([-4.8,2.19,1.328]);
+  check('Clicking the visible JP lettering targets the server, not the computer',d.elementFromPoint(logoPoint.x,logoPoint.y)===button);
+  button.dispatchEvent(new w.PointerEvent('pointerenter',{pointerType:'mouse'}));tick(120);
+  check('Server hover is independent of room',button.dataset.hover==='true'&&room.dataset.hover==='false');
+  check('Hover responds with motion unless reduced motion is enabled',reduced?Number(button.dataset.lift)===0:Number(button.dataset.lift)>0);
+  button.click();tick(600);
+  check('Click starts the server camera transition',reduced||d.documentElement.dataset.view==='transition');
+  check('During transition room does not open',d.querySelector('#monitor-app').inert);
+  tick(1600);
+  check('Server form is interactive only after arrival',d.documentElement.dataset.view==='server'&&app.dataset.open==='true'&&!app.inert);
+  check('Both scene buttons are disabled while inside server',button.disabled&&room.disabled);
+  check('Focus enters the in-server return button',d.activeElement===back);
+  check('Only server announces expanded state',button.getAttribute('aria-expanded')==='true'&&room.getAttribute('aria-expanded')==='false');
+  const rect=app.getBoundingClientRect(),returnRect=back.getBoundingClientRect();
+  check('Contact surface matches physical rack proportions',Math.abs(rect.width/rect.height-SERVER_SURFACE.width/SERVER_SURFACE.height)<.002);
+  const actualView=w.sceneMatrices[0];
+  check('Actual camera faces the JP side along +Z, not the monitor along +X',Math.abs(actualView[0]-1)<.0001&&Math.abs(actualView[10]-1)<.0001&&Math.abs(actualView[12]-4.8)<.0001);
+  const [cx,cy,cz]=SERVER_SURFACE.center;
+  const topLeft=project([cx-SERVER_SURFACE.width/2,cy+SERVER_SURFACE.height/2,cz]);
+  const bottomRight=project([cx+SERVER_SURFACE.width/2,cy-SERVER_SURFACE.height/2,cz]);
+  check('HTML matches the projected JP panel, not an unrelated screen',Math.abs(rect.left-topLeft.x)<1&&Math.abs(rect.top-topLeft.y)<1&&Math.abs(rect.right-bottomRight.x)<1&&Math.abs(rect.bottom-bottomRight.y)<1);
+  check('Return stays inside physical contact surface',returnRect.x>=rect.x&&returnRect.right<=rect.right&&returnRect.y>=rect.y&&returnRect.bottom<=rect.bottom);
+  const message=d.querySelector('#contact-message');message.value='Szkic pozostaje w serwerze.';message.focus();
+  check('Physical contact surface accepts keyboard focus',d.activeElement===message);
+  const configured=isContactConfigured(CONTACT_CONFIG.accessKey);
+  check('Submit availability matches recipient configuration',configured
+    ?form.dataset.state==='idle'&&!d.querySelector('#contact-submit').disabled&&form.querySelector('[data-contact-setup]').hidden
+    :form.dataset.state==='unconfigured'&&d.querySelector('#contact-submit').disabled&&!form.querySelector('[data-contact-setup]').hidden);
+  d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));tick(3000);
+  check('Escape restores overview and original focus',d.documentElement.dataset.view==='room'&&app.inert&&d.activeElement===button);
+  button.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
+  button.dispatchEvent(new w.KeyboardEvent('keyup',{key:'Enter',bubbles:true,cancelable:true}));tick(4400);
+  check('Keyboard activation reopens server and preserves draft',app.dataset.open==='true'&&message.value==='Szkic pozostaje w serwerze.');
+  back.click();tick(5800);
+  room.click();tick(7200);
+  check('Room and ASCII still work after visiting server',d.documentElement.dataset.view==='monitor'&&!d.querySelector('#monitor-app').inert&&app.inert);
+  d.querySelector('#monitor-back').click();tick(8600);
+  check('Room return restores room button focus',d.activeElement===room&&d.documentElement.dataset.view==='room');
+  button.click();tick(9000);
+  d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));tick(10400);
+  check('Escape safely reverses an unfinished server transition',app.inert&&d.documentElement.dataset.view==='room'&&d.activeElement===button);
+  window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {buildCableTube} from '../cable-mesh.js';
+const rope={points:[[0,1,0],[1,1,.2],[2,1,0]],distances:[0,1.02,2.04],length:2.04};
+const mesh=buildCableTube(rope);
+assert.ok(mesh.positions.length>100);
+assert.ok(mesh.positions.every(Number.isFinite));
+assert.equal(mesh.positions.length,mesh.cable.length);
+assert.ok(mesh.cable.some((v,i)=>i%3===0&&v===0));
+assert.ok(mesh.cable.some((v,i)=>i%3===0&&Math.abs(v-2.04)<1e-5));
+console.log('PASS rounded cable mesh, continuous arc lengths and physical plugs');

@@ -1,4 +1,5 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Monitor zoom regression</title></head><body><pre id="result">Testing monitor…</pre><iframe title="Scene under test" width="800" height="600"></iframe><script type="module">
+import {LAB_MONITOR} from '../rooms.js';
 const results=[];const check=(name,passed,details={})=>results.push({name,passed,...details});
 try{
  const html=await(await fetch('/')).text();
@@ -17,7 +18,7 @@ try{
  check('Focus enters return button',d.activeElement===back);
  const a=app.getBoundingClientRect(),b=back.getBoundingClientRect();
  check('Return button is inside the monitor screen',b.x>=a.x&&b.y>=a.y&&b.right<=a.right&&b.bottom<=a.bottom);
- check('App matches physical screen aspect',Math.abs(a.width/a.height-1.27/.77)<.002,{width:a.width,height:a.height});
+ check('App matches physical screen aspect',Math.abs(a.width/a.height-LAB_MONITOR.width/LAB_MONITOR.height)<.002,{width:a.width,height:a.height});
  // Exercise real DOM interaction on the app surface; temporary test-only content.
  const input=d.createElement('input');input.setAttribute('aria-label','Test application input');d.querySelector('#monitor-content').append(input);input.value='Works inside screen';input.focus();
  check('Application surface accepts interactive controls',d.activeElement===input&&input.value==='Works inside screen');input.remove();

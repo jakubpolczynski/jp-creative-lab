@@ -1,0 +1,53 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>Contact form regression</title></head>
+<body><pre id="result">Test formularza…</pre><button id="outside" type="button">Poza formularzem</button><script type="module">
+import {setupContactForm} from '/contact.js';
+const results=[],check=(name,passed)=>results.push({name,passed});
+try{
+  const source=new DOMParser().parseFromString(await(await fetch('/')).text(),'text/html');
+  const host=document.createElement('section');host.id='server-app';host.dataset.open='true';
+  host.append(source.querySelector('#contact-form').cloneNode(true));document.body.append(host);
+  const form=host.querySelector('form'),button=form.querySelector('[type="submit"]'),status=form.querySelector('[role="status"]');
+  const name=form.elements.namedItem('name'),email=form.elements.namedItem('email'),message=form.elements.namedItem('message');
+  let mode='reject',calls=0,pending;
+  setupContactForm(form,{accessKey:'12345678-1234-1234-1234-123456789abc',timeoutMs:200,fetchImpl:async(url,options)=>{
+    calls++;const payload=JSON.parse(options.body);
+    check('Transport receives only the configured endpoint and reply address',url==='https://api.web3forms.com/submit'&&payload.replyto==='kuba@example.com');
+    if(mode==='pending')return new Promise(resolve=>{pending=resolve});
+    if(mode==='network')throw Error('Test network error');
+    return {ok:mode!=='reject',json:async()=>({success:mode!=='reject',message:'<img src=x onerror=alert(1)>'})};
+  }});
+  const fill=()=>{name.value='Kuba';email.value='kuba@example.com';message.value='Szkic wiadomości testowej.'};
+  const submit=()=>form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+  const state=async target=>{
+    for(let i=0;i<100;i++){if(form.dataset.state===target)return;await new Promise(resolve=>setTimeout(resolve,10))}
+    throw Error('Timed out waiting for '+target);
+  };
+  check('Configured form is enabled and setup notice is hidden',!button.disabled&&form.querySelector('[data-contact-setup]').hidden);
+  fill();name.value='   ';submit();
+  check('Whitespace-only name is rejected without networking',calls===0&&form.dataset.state==='error');
+  fill();email.value='invalid';submit();
+  check('Native email validation prevents network requests',calls===0);
+  fill();form.elements.namedItem('botcheck').checked=true;submit();
+  check('Honeypot blocks submission without clearing draft',calls===0&&message.value==='Szkic wiadomości testowej.');
+  form.elements.namedItem('botcheck').checked=false;submit();await state('error');
+  check('Rejected API keeps all user fields',calls===1&&name.value==='Kuba'&&email.value==='kuba@example.com'&&message.value==='Szkic wiadomości testowej.');
+  check('Provider markup is never interpreted as HTML',!status.querySelector('img')&&status.textContent.includes('zachowana'));
+  mode='network';submit();await state('error');
+  check('Network error restores editable inputs and retry button',calls===2&&!button.disabled&&!name.matches(':disabled')&&form.getAttribute('aria-busy')==='false');
+  mode='pending';submit();
+  check('Pending request disables fields and indicates busy state',button.disabled&&name.matches(':disabled')&&form.getAttribute('aria-busy')==='true');
+  submit();submit();
+  check('Repeated submits cannot send duplicate requests',calls===3);
+  const outside=document.querySelector('#outside');host.dataset.open='false';outside.focus();
+  pending({ok:true,json:async()=>({success:true})});await state('success');
+  check('Late completion does not steal focus from the scene',document.activeElement===outside);
+  check('Only confirmed success resets user data',message.value===''&&email.value===''&&name.value==='');
+  check('Success describes acceptance, not guaranteed delivery',status.textContent.includes('przyjęta do wysłania'));
+  check('Button is enabled after completion',!button.disabled&&form.getAttribute('aria-busy')==='false');
+  host.dataset.open='true';fill();mode='pending';submit();await state('error');
+  check('Timeout preserves draft and allows manual retry',calls===4&&message.value==='Szkic wiadomości testowej.'&&!button.disabled&&status.textContent.includes('na czas'));
+  check('Timeout does not retry automatically',calls===4);
+  window.testResults={passed:results.filter(r=>r.passed).length,failed:results.filter(r=>!r.passed).length,results};
+}catch(error){window.testResults={failed:1,error:String(error),stack:error.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Flexible cable GPU regression</title></head>
+<body><pre id="result">Testing the actual uploaded ropes and causal receivers…</pre><iframe width="1440" height="1000" style="border:0" title="Flexible cable scene"></iframe>
+<script type="module">
+import {runRopeFixture} from './rope-fixture.js';
+try{window.testResults=await runRopeFixture(false)}catch(e){window.testResults={failed:1,error:String(e),stack:e.stack}}
+document.querySelector('#result').textContent=JSON.stringify(window.testResults,null,2);
+</script></body></html>

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {createRoomLayout} from '../room-layout.js';
+import {WORLD_ROOMS} from '../rooms.js';
+const layout=createRoomLayout(WORLD_ROOMS),original=[...WORLD_ROOMS[0].center];
+assert.ok(layout.move('gallery',[-20,0,-20]));
+assert.deepEqual(WORLD_ROOMS[0].center,original);
+assert.equal(layout.move('gallery',layout.room('monitor').center),false,'Cannot overlap another island');
+assert.ok(layout.move('sound',[1000,0,1000]),'No fixed map/cable distance limit');
+layout.restore('gallery',original);assert.deepEqual(layout.room('gallery').center,original);
+console.log('PASS session-only room positions, immutable defaults, overlap rejection and unbounded placement');

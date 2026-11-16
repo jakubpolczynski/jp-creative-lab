@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-let source;try{source=await fs.readFile(new URL('../monitor.js',import.meta.url),'utf8')}catch{assert.fail('Monitor camera module missing')}
-const {createMonitorTransition,monitorProgress,monitorFrame,chairPose}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+import {createMonitorTransition,monitorProgress,monitorFrame,chairPose} from '../monitor.js';
+import {LAB_MONITOR} from '../rooms.js';
 const state=createMonitorTransition();assert.equal(monitorProgress(state,0,false),0);
 state.from=0;state.to=1;state.started=100;
 assert.equal(monitorProgress(state,100,false),0);
@@ -11,8 +10,8 @@ assert.equal(monitorProgress(state,101,true),1,'Reduced motion skips camera trav
 const wide=monitorFrame(1280,900),narrow=monitorFrame(390,844);
 assert.ok(wide.width<1280&&wide.height<900);
 assert.ok(narrow.width<390&&narrow.height<844);
-assert.ok(Math.abs(wide.width/wide.height-1.27/.77)<1e-9);
-assert.ok(Math.abs(narrow.width/narrow.height-1.27/.77)<1e-9);
+assert.ok(Math.abs(wide.width/wide.height-LAB_MONITOR.width/LAB_MONITOR.height)<1e-9);
+assert.ok(Math.abs(narrow.width/narrow.height-LAB_MONITOR.width/LAB_MONITOR.height)<1e-9);
 assert.ok(wide.top>=70&&narrow.top>=70,'Back button remains reachable');
 assert.equal(typeof chairPose,'function','Chair choreography must be implemented');
 assert.deepEqual(chairPose(0),{angle:0,x:0,z:0});
