@@ -130,44 +130,58 @@ export function createLabUI({open,close,refresh,layout}){
   });
   $('#sound-mute').addEventListener('click',()=>{seq.setMuted(!seq.state.muted);$('#sound-mute').setAttribute('aria-pressed',String(seq.state.muted));refresh()});
   function stop(){seq.stop();syncSound()}
-  function update({overview,target,amount,now,reduced,project}){
+  let navOverview=null,panelKey='',roomKeys=new Map(),soundStep=-2;
+  function update({overview,target,amount,now,reduced,project,projectionKey}){
     const show=amount===1&&ROOMS.some(r=>r.id===target);
     if(active&&(!show||active!==target))stop();
     active=show?target:null;
-    nav.hidden=!overview;
-    for(const b of nav.querySelectorAll('button'))b.disabled=!overview;
+    if(navOverview!==overview){
+      nav.hidden=!overview;
+      for(const b of nav.querySelectorAll('button'))b.disabled=!overview;
+      navOverview=overview;
+    }
     for(const definition of ROOMS){
       const room=layout?.room(definition.id)||definition;
       const input=inputs[room.id],pose=poses[room.id],button=buttons[room.id];
-      button.dataset.center=room.center.join(',');
       stepRoomMotion(pose,overview?input:{hover:false,pressed:false},(now-last)/1000,reduced);
       if(!overview){Object.assign(pose,{lift:0,velocity:0,scale:1,glow:0});input.hover=false;input.pressed=false;}
-      const hull=roomHull(roomCorners(room).map(project));
-      button.style.clipPath='polygon('+hull.map(p=>p.map(v=>v.toFixed(2)+'px').join(' ')).join(',')+')';
-      labels[room.id].outline.querySelector('polygon').setAttribute('points',hull.map(p=>p.join(',')).join(' '));
-      button.disabled=!overview;button.setAttribute('aria-expanded',String(target===room.id&&amount>0));
-      const p=project([room.center[0],-.7,room.center[2]+2.7]);
-      Object.assign(labels[room.id].label.style,{left:p[0]+'px',top:p[1]+'px'});labels[room.id].label.hidden=!overview;
+      const roomKey=projectionKey===undefined?null:`${projectionKey}:${room.center}:${overview}:${target}:${amount>0}`;
+      if(roomKey===null||roomKeys.get(room.id)!==roomKey){
+        button.dataset.center=room.center.join(',');
+        const hull=roomHull(roomCorners(room).map(project));
+        button.style.clipPath='polygon('+hull.map(p=>p.map(v=>v.toFixed(2)+'px').join(' ')).join(',')+')';
+        labels[room.id].outline.querySelector('polygon').setAttribute('points',hull.map(p=>p.join(',')).join(' '));
+        button.disabled=!overview;button.setAttribute('aria-expanded',String(target===room.id&&amount>0));
+        const p=project([room.center[0],-.7,room.center[2]+2.7]);
+        Object.assign(labels[room.id].label.style,{left:p[0]+'px',top:p[1]+'px'});labels[room.id].label.hidden=!overview;
+        roomKeys.set(room.id,roomKey);
+      }
     }
     last=now;
-    panel.dataset.open=String(show);panel.inert=!show;panel.setAttribute('aria-hidden',String(!show));
-    surface.hidden=!(show&&target!=='gallery');
+    const nextPanelKey=`${show}:${target}:${innerWidth}:${innerHeight}`;
+    if(nextPanelKey!==panelKey){
+      panel.dataset.open=String(show);panel.inert=!show;panel.setAttribute('aria-hidden',String(!show));
+      surface.hidden=!(show&&target!=='gallery');
+      if(show){
+        const room=ROOMS.find(r=>r.id===target);panel.style.setProperty('--room-color',room.color);
+        const frame=labMonitorFrame(innerWidth,innerHeight);
+        Object.assign(panel.style,{left:frame.left+'px',top:frame.top+'px',width:frame.width+'px',height:frame.height+'px'});
+        panel.dataset.room=target;
+        $('#lab-connection').textContent=room.subtitle;
+        surface.setAttribute('aria-label',target==='particles'?'Podgląd cząsteczek 3D':target==='materials'?'Podgląd materiału 3D':'Wizualizacja rytmu');
+        $('#lab-title').textContent=room.title;$('#lab-description').textContent={
+          gallery:'Jeden prawdziwy projekt. Otwórz ekran i zajrzyj pod obudowę.',
+          particles:`${innerWidth<700?'750':'2000'} punktów. Trzy różne zachowania.`,
+          materials:'Światło zapisane w kodzie.',
+          sound:'Ułóż własny rytm. Dźwięk zaczyna się od Ciebie.',
+        }[target];
+        for(const section of panel.querySelectorAll('[data-lab]'))section.hidden=section.dataset.lab!==target;
+      }
+      panelKey=nextPanelKey;
+    }
     if(show){
-      const room=ROOMS.find(r=>r.id===target);panel.style.setProperty('--room-color',room.color);
-      const frame=labMonitorFrame(innerWidth,innerHeight);
-      Object.assign(panel.style,{left:frame.left+'px',top:frame.top+'px',width:frame.width+'px',height:frame.height+'px'});
-      panel.dataset.room=target;
-      $('#lab-connection').textContent=room.subtitle;
-      surface.setAttribute('aria-label',target==='particles'?'Podgląd cząsteczek 3D':target==='materials'?'Podgląd materiału 3D':'Wizualizacja rytmu');
-      $('#lab-title').textContent=room.title;$('#lab-description').textContent={
-        gallery:'Jeden prawdziwy projekt. Otwórz ekran i zajrzyj pod obudowę.',
-        particles:`${innerWidth<700?'750':'2000'} punktów. Trzy różne zachowania.`,
-        materials:'Światło zapisane w kodzie.',
-        sound:'Ułóż własny rytm. Dźwięk zaczyna się od Ciebie.',
-      }[target];
-      for(const section of panel.querySelectorAll('[data-lab]'))section.hidden=section.dataset.lab!==target;
       const step=seq.currentStep();
-      stepButtons.forEach((b,i)=>b.dataset.current=String(i%8===step));
+      if(step!==soundStep){stepButtons.forEach((b,i)=>b.dataset.current=String(i%8===step));soundStep=step}
     }
     if(show&&!wasShown)$('#lab-back').focus({preventScroll:true});
     wasShown=show;

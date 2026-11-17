@@ -302,7 +302,7 @@ async function launch(){
   const serverPose=createRoomMotion(),serverInput={hover:false,pressed:false};
   let pointerHover=false,keyboardFocus=false,activePointer=null,lastMotion=started,clickUntil=0,cancelPointerClick=false;
   let serverPointerHover=false,serverKeyboardFocus=false,serverPointer=null,serverClickUntil=0,cancelServerClick=false;
-  let bloom=null,animationFrame=0,lastFrame=-Infinity,contextLost=false;
+  let bloom=null,animationFrame=0,contextLost=false;
    const labs=extendedWorld?createLabUI({open:id=>setView(true,id,labs.opener),close:()=>setView(false,cameraTarget),refresh,layout}):null;
   let labRenderer=null;
    if(labs)try{labRenderer=createLabRenderer(gl,makeProgram)}catch(error){console.error('Lab renderer:',error);labs.error('Eksperyment 3D nie jest dostępny. Odśwież stronę lub zmień przeglądarkę.')}
@@ -313,6 +313,8 @@ async function launch(){
      if(roomButton)drag.bind(roomButton,'monitor');
      for(const room of ROOMS)drag.bind(labs.buttons[room.id],room.id);
    }
+  const uiKeys=new Map();
+  function uiChanged(name,key){if(uiKeys.get(name)===key)return false;uiKeys.set(name,key);return true}
   function render(now=performance.now()){
      drag?.update(now);
     cameraAmount=monitorProgress(camera,now,motion.matches);
@@ -358,7 +360,7 @@ async function launch(){
       const o=project([0,0,0]),x=project([1,0,0]).map((v,j)=>v-o[j]),z=project([0,0,1]).map((v,j)=>v-o[j]),det=x[0]*z[1]-z[0]*x[1];
       groundProject=(px,py)=>[( (px-o[0])*z[1]-(py-o[1])*z[0])/det,0,((py-o[1])*x[0]-(px-o[0])*x[1])/det];
     }
-   if(roomButton){
+    if(roomButton&&uiChanged('room',`${cssWidth}:${cssHeight}:${orthoHeight}:${view}:${layout.room('monitor').center}:${overview}:${onServer}:${onLab}:${camera.to}:${input.hover}:${input.pressed}:${pose.lift}`)){
      const points=[];
        for(const [xx,yy,zz] of roomCorners(layout.room('monitor'))){
        const [x,y]=projectView(view,[xx,yy,zz]);
@@ -374,7 +376,7 @@ async function launch(){
       roomButton.dataset.lift=pose.lift.toFixed(4);
       roomButton.dataset.center=layout.room('monitor').center.join(',');
     }
-    if(serverButton){
+     if(serverButton&&uiChanged('server',`${cssWidth}:${cssHeight}:${orthoHeight}:${view}:${overview}:${onServer}:${camera.to}:${serverInput.hover}:${serverInput.pressed}:${serverPose.lift}:${serverPose.scale}`)){
       const points=SERVER_BOUNDS.map(([xx,yy,zz])=>{
         const [x,y]=projectView(view,[-4.8+(xx+4.8)*serverPose.scale,yy*serverPose.scale+serverPose.lift,.05+(zz-.05)*serverPose.scale]);
         return [cssWidth/2+x*cssHeight/orthoHeight,cssHeight/2-y*cssHeight/orthoHeight];
@@ -387,14 +389,14 @@ async function launch(){
       serverButton.dataset.hover=String(serverInput.hover);serverButton.dataset.pressed=String(serverInput.pressed);
       serverButton.dataset.lift=serverPose.lift.toFixed(4);
     }
-    if(monitorApp){
+     if(monitorApp&&uiChanged('monitor-app',`${cssWidth}:${cssHeight}:${onServer}:${onLab}:${cameraAmount}:${camera.to}`)){
       Object.assign(monitorApp.style,{left:monitorViewport.left+'px',top:monitorViewport.top+'px',width:monitorViewport.width+'px',height:monitorViewport.height+'px'});
        const show=!onServer&&!onLab&&cameraAmount===1&&camera.to===1;
      monitorApp.dataset.open=String(show);monitorApp.inert=!show;monitorApp.setAttribute('aria-hidden',String(!show));
      if(show&&!appVisible)monitorBack?.focus({preventScroll:true});
      appVisible=show;
     }
-    if(serverApp){
+     if(serverApp&&uiChanged('server-app',`${cssWidth}:${cssHeight}:${onServer}:${cameraAmount}:${camera.to}`)){
       Object.assign(serverApp.style,{left:serverViewport.left+'px',top:serverViewport.top+'px',width:serverViewport.width+'px',height:serverViewport.height+'px'});
       const show=onServer&&cameraAmount===1&&camera.to===1;
       serverApp.dataset.open=String(show);serverApp.inert=!show;serverApp.setAttribute('aria-hidden',String(!show));
@@ -402,7 +404,7 @@ async function launch(){
       serverVisible=show;
     }
      document.documentElement.dataset.view=cameraAmount===0&&camera.to===0?'room':cameraAmount===1&&camera.to===1?cameraTarget:'transition';
-      labs?.update({overview,target:cameraTarget,amount:camera.to===1?cameraAmount:-cameraAmount,now,reduced:motion.matches,project:p=>{
+       labs?.update({overview,target:cameraTarget,amount:camera.to===1?cameraAmount:-cameraAmount,now,reduced:motion.matches,projectionKey:`${cssWidth}:${cssHeight}:${orthoHeight}:${cameraView}`,project:p=>{
        const [x,y]=projectView(cameraView,p);return[cssWidth/2+x*cssHeight/orthoHeight,cssHeight/2-y*cssHeight/orthoHeight];
       }});
      const poses={...labs?.poses,monitor:pose},chairs={};
@@ -474,11 +476,12 @@ async function launch(){
  function tick(now){
    animationFrame=0;
    if(contextLost||document.hidden)return;
-    if((clickUntil>0&&now>=clickUntil)||(serverClickUntil>0&&now>=serverClickUntil)){
-      if(now>=clickUntil)clickUntil=0;if(now>=serverClickUntil)serverClickUntil=0;
-      render(now);lastFrame=now;
-    }
-   else if(now-lastFrame>=1000/30){render(now);lastFrame=now;}
+     if((clickUntil>0&&now>=clickUntil)||(serverClickUntil>0&&now>=serverClickUntil)){
+       if(now>=clickUntil)clickUntil=0;if(now>=serverClickUntil)serverClickUntil=0;
+     }
+     // Native RAF cadence: 60 Hz displays get 60 FPS, faster displays need not
+     // drop alternating frames due to timestamp jitter around a manual limiter.
+     render(now);
      const moving=(state,active)=>Math.abs(state.lift-(active.pressed?-.11:active.hover?.16:0))>.0001||Math.abs(state.velocity)>.001;
      if(drag?.pending||drag?.active||(!motion.matches&&worldFrame?.moving))wake();
      if((!motion.matches&&((signalLength&&cameraAmount<1)||cameraAmount!==camera.to||moving(pose,input)||moving(serverPose,serverInput)||labs?.moving()||(camera.to===1&&ROOMS.some(r=>r.id===cameraTarget))))||labs?.seq.state.playing||now<clickUntil||now<serverClickUntil)wake();

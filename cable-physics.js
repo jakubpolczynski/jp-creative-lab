@@ -2,8 +2,8 @@ import {cableDistances} from './cables.js';
 import {pointInside} from './collisions.js';
 export const CABLE_RADIUS=.085;
 const clearance=CABLE_RADIUS+.006,spacing=.42;
-const distance=(a,b)=>Math.hypot(...a.map((v,j)=>v-b[j]));
-const mix=(a,b,t)=>a.map((v,j)=>v+(b[j]-v)*t);
+const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
 export function cableEndpoints(room,center=room.center,pose={lift:0,scale:1},server={lift:0,scale:1}){
   const port=room.port,rack=[-4.8,0,.05];
   return {
@@ -109,7 +109,7 @@ function repair(rope,world){
   let changed=false;
   for(let i=0;i<rope.points.length-1;i++){
     const a=rope.points[i],b=rope.points[i+1],exemption=collarExemption(rope,i,world);
-    if(!world.segmentHit(a,b,clearance,exemption))continue;
+    if(exemption?!world.segmentHit(a,b,clearance,exemption):world.segmentClear(a,b,clearance))continue;
     if(i===0||i===rope.points.length-2)throw Error('Non-socket solid intersects cable collar '+world.segmentHit(a,b,clearance,exemption).collider.id);
     const route=samplePath(routeCable(a,b,world));
     rope.points.splice(i+1,0,...route.slice(1,-1));i+=route.length-2;changed=true;
@@ -135,7 +135,7 @@ export function stepRope(rope,seconds,endpoints,world,{reduced=false}={}){
     }
     rope.quiet=0;
   }
-  {
+  if(endpointMotion>0||world.moving){
     const oldDistances=cableDistances(oldPoints),newDistances=cableDistances(rope.points),oldLength=oldDistances.at(-1);
     let edge=1;
     const sweepPrevious=rope.points.map((p,i)=>{
@@ -175,7 +175,7 @@ export function stepRope(rope,seconds,endpoints,world,{reduced=false}={}){
       }
       for(let i=2;i<n-2;i++){
         const p=rope.points[i],target=mix(p,mix(rope.points[i-1],rope.points[i+1],.5),.035);
-        if(!world.segmentHit(rope.points[i-1],target,clearance)&&!world.segmentHit(target,rope.points[i+1],clearance))rope.points[i]=target;
+        if(world.bendClear(rope.points[i-1],target,rope.points[i+1],clearance))rope.points[i]=target;
       }
       for(let i=2;i<n-2;i++){
         const old=rope.points[i],p=world.project(old,rope.previous[i],clearance);
@@ -197,7 +197,7 @@ export function stepRope(rope,seconds,endpoints,world,{reduced=false}={}){
   if(reeled)resetRest(rope);
   let simplified=false;
   for(let i=2;i<rope.points.length-3;i++){
-    if(distance(rope.points[i-1],rope.points[i+1])<spacing*1.25&&!world.segmentHit(rope.points[i-1],rope.points[i+1],clearance)){
+    if(distance(rope.points[i-1],rope.points[i+1])<spacing*1.25&&world.segmentClear(rope.points[i-1],rope.points[i+1],clearance)){
       rope.points.splice(i,1);simplified=true;i--;
     }
   }

@@ -6,21 +6,39 @@ import {createSignalNetwork} from './signals.js';
 export function createCableWorld({layout,rackBoxes=[]}){
   const local=new Map(layout.all().map(r=>[r.id,roomColliders(buildRoom(r),r.id)])),collision=createCollisionWorld();
   const neutral={lift:0,scale:1},ropes=new Map();
-  let last=0,frame=null,previousBoxes=new Map(),signature='',geometryKey='';
+  let last=0,frame=null,previousBoxes=new Map(),signature='',geometryKey='',accumulator=0;
   let previousState={centers:Object.fromEntries(layout.all().map(r=>[r.id,[...r.center]])),poses:{},server:{...neutral},chairs:{}};
+  const transformed=new Map();
   function boxesFor(poses,server,chairs,centers){
     const boxes=[];
-    for(const room of layout.all())for(const b of local.get(room.id))boxes.push(transformBox(b,centers?.[room.id]||room.center,poses[room.id]||neutral,chairs[room.id]));
-    for(const b of rackBoxes){
-      const pivot=[-4.8,0,.05],min=b.min.map((v,j)=>pivot[j]+(v-pivot[j])*server.scale+(j===1?server.lift:0)),max=b.max.map((v,j)=>pivot[j]+(v-pivot[j])*server.scale+(j===1?server.lift:0));
-      boxes.push({...b,min,max});
+    for(const room of layout.all()){
+      const center=centers?.[room.id]||room.center,pose=poses[room.id]||neutral,chair=chairs[room.id],
+        key=JSON.stringify([center,pose.lift,pose.scale,chair?.angle||0,chair?.x||0,chair?.z||0]);
+      let cache=transformed.get(room.id);
+      if(cache?.key!==key){cache={key,boxes:local.get(room.id).map(b=>transformBox(b,center,pose,chair))};transformed.set(room.id,cache)}
+      boxes.push(...cache.boxes);
     }
+    const rackKey=`${server.lift}:${server.scale}`;
+    let rack=transformed.get('rack');
+    if(rack?.key!==rackKey)rack={key:rackKey,boxes:rackBoxes.map(b=>{
+      const pivot=[-4.8,0,.05],min=b.min.map((v,j)=>pivot[j]+(v-pivot[j])*server.scale+(j===1?server.lift:0)),max=b.max.map((v,j)=>pivot[j]+(v-pivot[j])*server.scale+(j===1?server.lift:0));
+      return {...b,min,max};
+    })};
+    transformed.set('rack',rack);boxes.push(...rack.boxes);
     return boxes;
   }
   collision.set(boxesFor({},neutral,{}));
   previousBoxes=new Map(collision.boxes.map(b=>[b.id,b]));
   for(const room of layout.all())ropes.set(room.id,createRope(cableEndpoints(room),collision));
   const network=createSignalNetwork(layout.all().map(r=>({id:r.id,color:r.rgb,length:ropes.get(r.id).length})));
+  function deliver(seconds,reduced){
+    const cables=layout.all().map(room=>{
+      const rope=ropes.get(room.id),previous=frame?.cables.find(c=>c.id===room.id);
+      return {id:room.id,rope,mesh:previous?.version===rope.version?previous.mesh:buildCableTube(rope,previous?.mesh),version:rope.version};
+    });
+    frame={cables,network:network.advance(seconds,Object.fromEntries(cables.map(c=>[c.id,c.rope.length])),reduced),moving:cables.some(c=>c.rope.moving),bounds:cables.map(c=>c.rope.bounds)};
+    return frame;
+  }
   function advance(seconds,poses={},server=neutral,chairs={},reduced=false){
     const key=JSON.stringify([layout.all().map(r=>r.center),Object.fromEntries(Object.entries(poses).map(([id,p])=>[id,[p.lift,p.scale]])),[server.lift,server.scale],chairs,reduced]);
     if(frame&&seconds===last&&key===signature)return frame;
@@ -30,10 +48,25 @@ export function createCableWorld({layout,rackBoxes=[]}){
       return frame;
     }
     const dt=Math.min(.1,Math.max(0,seconds-last));
+    if(frame&&!reduced&&key===signature){
+      // Stationary solids need neither transform interpolation nor temporal
+      // broad-phase reconstruction. Keep the solver at a real fixed 120 Hz,
+      // independent of a 60/144/165 Hz display and event-triggered refreshes.
+      accumulator+=dt;
+      const steps=Math.floor((accumulator+1e-10)*120);
+      accumulator=Math.max(0,accumulator-steps/120);
+      for(let i=0;i<steps;i++)for(const rope of ropes.values())stepRope(rope,1/120,rope.endpoints,collision);
+      last=seconds;return deliver(seconds,false);
+    }
+    accumulator=0;
     const current={centers:Object.fromEntries(layout.all().map(r=>[r.id,[...r.center]])),poses:structuredClone(poses),server:{...server},chairs:structuredClone(chairs)};
     const blend=(a,b,t)=>Object.fromEntries(Object.keys(b).map(k=>[k,(a?.[k]??(k==='scale'?1:0))+((b[k])-(a?.[k]??(k==='scale'?1:0)))*t]));
-    const motion=Math.max(...layout.all().map(r=>Math.hypot(...r.center.map((v,j)=>v-previousState.centers[r.id][j]))));
-    const steps=Math.max(1,Math.min(24,Math.ceil(Math.max(dt*120,motion/.12))));
+    // Translation/scale/lift produce linearly moving AABB faces, handled by
+    // continuous point AND segment CCD. Spatial subdivisions would multiply the
+    // whole solver by cursor speed and cause a catch-up spiral on fast drags.
+    // Only rotating chairs need additional samples for their nonlinear bounds.
+    const rotation=Math.max(0,...layout.all().map(r=>Math.abs((current.chairs[r.id]?.angle||0)-(previousState.chairs[r.id]?.angle||0))));
+    const steps=Math.max(1,Math.min(24,Math.ceil(Math.max(dt*120-1e-8,rotation/.03))));
     let actual;
     for(let step=1;step<=steps;step++){
       const t=step/steps,centers={},subPoses={},subChairs={},subServer=blend(previousState.server,current.server,t);
@@ -45,25 +78,20 @@ export function createCableWorld({layout,rackBoxes=[]}){
       const subKey=JSON.stringify([centers,Object.fromEntries(Object.entries(subPoses).map(([id,p])=>[id,[p.lift,p.scale]])),[subServer.lift,subServer.scale],subChairs]);
       if(subKey!==geometryKey){
         actual=boxesFor(subPoses,subServer,subChairs,centers);
-        collision.set(actual.map(b=>{
+        collision.update(actual.map(b=>{
           const old=previousBoxes.get(b.id),moved=old&&b.min.some((v,j)=>Math.abs(v-old.min[j])+Math.abs(b.max[j]-old.max[j])>1e-8);
           return moved?{...b,previous:old}:b;
         }));
         geometryKey=subKey;
-      }else{actual=[...previousBoxes.values()];if(collision.boxes.some(b=>b.previous))collision.set(actual)}
+      }else{actual=[...previousBoxes.values()];if(collision.moving)collision.update(actual)}
       for(const room of layout.all())stepRope(ropes.get(room.id),reduced?0:dt/steps,cableEndpoints(room,centers[room.id],subPoses[room.id],subServer),collision,{reduced});
       previousBoxes=new Map(actual.map(b=>[b.id,b]));
     }
-    const cables=[];
-    for(const room of layout.all()){
-      const rope=ropes.get(room.id);
-      cables.push({id:room.id,rope,mesh:buildCableTube(rope)});
-    }
-    previousBoxes=new Map(actual.map(b=>[b.id,b]));collision.set(actual);
+    previousBoxes=new Map(actual.map(b=>[b.id,b]));
+    if(collision.moving)collision.update(actual);
     previousState=current;
     last=seconds;signature=key;
-    frame={cables,network:network.advance(seconds,Object.fromEntries(cables.map(c=>[c.id,c.rope.length])),reduced),moving:cables.some(c=>c.rope.moving),bounds:cables.map(c=>c.rope.bounds)};
-    return frame;
+    return deliver(seconds,reduced);
   }
   return {advance,collision,ropes,get frame(){return frame},dispose(){ropes.clear()}};
 }

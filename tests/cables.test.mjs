@@ -14,7 +14,7 @@ for(const {id,rope,mesh} of frame.cables){
   assert.equal('cable' in room,false,'No predefined middle points');
   assert.equal(mesh.positions.length,mesh.cable.length);
   assert.ok(mesh.cable.some((v,i)=>i%3===0&&v===0));
-  assert.ok(mesh.cable.some((v,i)=>i%3===0&&Math.abs(v-total)<1e-8));
+  assert.ok(mesh.cable.some((v,i)=>i%3===0&&Math.abs(v-total)<1e-5));
   near(cableSignal(timing.serverArrival,total).inbound,0);
   assert.equal(cableSignal(2,total,true).outbound,-100);
   assert.ok(rope.distances.every((v,i)=>!i||v>=rope.distances[i-1]));

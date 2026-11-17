@@ -156,16 +156,18 @@ export function createLabRenderer(gl,makeProgram){
   function updateCables(cables){
     for(const c of cables){
       const entry=worlds.find(w=>w.room.id===c.id);
-      if(!entry.cable){entry.cable=upload(c.mesh,true);continue}
+      if(entry.cable&&entry.cable.version===c.version)continue;
+      if(!entry.cable){entry.cable=upload(c.mesh,true);entry.cable.version=c.version;continue}
       const gpu=entry.cable,count=c.mesh.positions.length/3,grow=count>gpu.capacity;
       if(grow)gpu.capacity=2**Math.ceil(Math.log2(count));
       for(let index=0;index<6;index++){
         gl.bindBuffer(gl.ARRAY_BUFFER,gpu.attributes[index]);
         if(grow)gl.bufferData(gl.ARRAY_BUFFER,gpu.capacity*(index===4?1:3)*4,gl.DYNAMIC_DRAW);
         const data=index===0?c.mesh.positions:index===1?c.mesh.normals:index===2?c.mesh.colors:index===5?c.mesh.cable:null;
-        if(data)gl.bufferSubData(gl.ARRAY_BUFFER,0,new Float32Array(data));
+        if(data&&(index!==2||grow||gpu.count!==count))gl.bufferSubData(gl.ARRAY_BUFFER,0,data instanceof Float32Array?data:new Float32Array(data));
       }
       gpu.count=count;
+      gpu.version=c.version;
     }
   }
   const ball=upload(sculpture()),cube=meshBuilder();cube.box(0,.5,0,.25,1,.3,ROOMS.find(r=>r.id==='sound').rgb);
