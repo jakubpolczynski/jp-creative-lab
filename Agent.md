@@ -63,7 +63,7 @@ Opisuj stan wynikający z kodu, a nie planowaną wizję produktu. Nie zakładaj,
 | Plik | Odpowiedzialność |
 | --- | --- |
 | `index.html` | Struktura strony, style, canvas, dostępny przycisk pokoju i HTML aplikacji na monitorze. |
-| `viewer.606ceb00e1e1.js` | Wczytywanie GLB, geometria GPU, shadery, światło i bloom, kamera, obsługa sceny i pętla renderowania. |
+| `viewer.62ca3dcbbe48.js` | Wczytywanie GLB, geometria GPU, shadery, światło i bloom, kamera, obsługa sceny i pętla renderowania. |
 | `scene-geometry.js` | Granica racka w GLB; wyklucza stary pokój i kabel z pełnego świata. |
 | `rooms.js`, `room-world.js` | Rejestr pokojów, responsywne kamery, granice świata, voxelowe wyspy i kable. |
 | `cables.js` | Wspólny styl, odległości wzdłuż przewodu i kolory smug; bez zapisanych tras. |
@@ -128,7 +128,15 @@ interfejs ma również obsługę wklejania przez Ctrl+V.
 - Powrót przyciskiem lub Escape odtwarza ruch krzesła i przywraca fokus pokoju.
 - Logo `[ JP ]` i jego poświata znikają przy wejściu w monitor i wracają po wyjściu.
 - Zachowaj obsługę dotyku, Enter, spacji, widocznego fokusu, `inert` i ARIA.
-- Respektuj `prefers-reduced-motion`, pauzę niewidocznej karty i limit 30 FPS.
+- Respektuj `prefers-reduced-motion` i pauzę niewidocznej karty. Nie przywracaj
+  starego limitu 30 FPS: idle ma utrzymać co najmniej 60 FPS z fizyką i animacją.
+  Natywny RAF może rysować więcej na ekranie 144/165 Hz. Fizyka nieruchomego
+  świata pracuje w stałych podkrokach 120 Hz, niezależnie od częstotliwości RAF.
+  Nie wyłączaj solvera/kolizji/bloom dla wyniku wydajności. Pomiar:
+  `tests/idle-performance.cjs`; ograniczenia i dowody: `docs/idle-performance.md`.
+  Podczas przenoszenia również zachowuj budżet 60 FPS. Test prawdziwego
+  przeciągania: `tests/drag-performance.cjs`; opis: `docs/drag-performance.md`.
+  Indeks kolizji aktualizuj inkrementalnie; nie wyłączaj CCD ani innych kabli.
 - Zachowaj czytelny komunikat przy braku lub utracie kontekstu WebGL2.
 
 ### Kontakt

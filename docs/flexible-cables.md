@@ -1,5 +1,10 @@
 # Giętkie kable i przenoszenie pokoi
 
+Aktualizacja wydajności 2026-11-17: stary limit 30 FPS został usunięty.
+Aktualny renderer, pomiary sprzętowe i zmiany solvera:
+[idle-performance.md](idle-performance.md). Wyniki i hash poniżej dokumentują
+poprzednie wydanie funkcji, nie aktualny benchmark.
+
 Aktualny zakres zastępuje opis sztywnych tras i stałych czasów w
 `four-rooms.md`. Bez nowych zależności, zmiany GLB, publikacji i wysyłania maili.
 

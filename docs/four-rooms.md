@@ -1,6 +1,8 @@
 # Cztery nowe pokoje — implementacja i weryfikacja
 
 **Aktualizacja:** wygląd i aplikacje opisane niżej pozostają aktualne.
+Limit 30 FPS z wcześniejszego etapu zastępuje natywny RAF i budżet idle 60 FPS:
+[pomiary i ograniczenia](idle-performance.md).
 Opis sztywnych tras kabli, ich stałych długości/czasów oraz dawne liczby
 trójkątów zostały zastąpione przez [giętkie kable i przenoszenie](flexible-cables.md).
 Poniższe szczegóły tras dokumentują wcześniejszy etap, nie bieżący solver.

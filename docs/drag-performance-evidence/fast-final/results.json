@@ -1,0 +1,512 @@
+[
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "room": "gallery",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10005.5,
+    "frames": 1650,
+    "fps": 164.9092998850632,
+    "perSecond": [
+      165,
+      165,
+      164,
+      164,
+      166,
+      164,
+      165,
+      166,
+      165,
+      164
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999998909,
+      "p99": 6.200000000000728,
+      "max": 12
+    },
+    "cpuMs": {
+      "p50": 3.800000000745058,
+      "p95": 6.299999998882413,
+      "p99": 7.199999999254942
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5085,
+    "signalChanges": 10868,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "room": "particles",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10010.199999999255,
+    "frames": 1651,
+    "fps": 164.93176959502537,
+    "perSecond": [
+      165,
+      164,
+      166,
+      165,
+      164,
+      165,
+      165,
+      165,
+      164,
+      166
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.100000000000364,
+      "p99": 6.200000000000728,
+      "max": 6.300000000001091
+    },
+    "cpuMs": {
+      "p50": 3.599999999627471,
+      "p95": 6.100000001490116,
+      "p99": 7.599999999627471
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5055,
+    "signalChanges": 10992,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "room": "materials",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10008.099999999627,
+    "frames": 1646,
+    "fps": 164.46678190666174,
+    "perSecond": [
+      161,
+      165,
+      166,
+      164,
+      166,
+      165,
+      165,
+      164,
+      164,
+      165
+    ],
+    "minSecond": 161,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.100000000000364,
+      "p99": 6.200000000000728,
+      "max": 12.199999999999818
+    },
+    "cpuMs": {
+      "p50": 3.699999999254942,
+      "p95": 7.799999998882413,
+      "p99": 9.800000000745058
+    },
+    "over25ms": 0,
+    "pointerEvents": 590,
+    "roomMoves": 590,
+    "geometryChanges": 5075,
+    "signalChanges": 10725,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "room": "sound",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10006.199999999255,
+    "frames": 1651,
+    "fps": 164.99770142512872,
+    "perSecond": [
+      165,
+      164,
+      165,
+      166,
+      165,
+      164,
+      166,
+      164,
+      165,
+      166
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.100000000000364,
+      "p99": 6.200000000000728,
+      "max": 6.600000000000364
+    },
+    "cpuMs": {
+      "p50": 4,
+      "p95": 7.5,
+      "p99": 8.400000000372529
+    },
+    "over25ms": 0,
+    "pointerEvents": 599,
+    "roomMoves": 599,
+    "geometryChanges": 5090,
+    "signalChanges": 10362,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "room": "monitor",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10003.5,
+    "frames": 1650,
+    "fps": 164.9422702054281,
+    "perSecond": [
+      165,
+      164,
+      165,
+      165,
+      166,
+      165,
+      164,
+      166,
+      164,
+      165
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999998909,
+      "p99": 6.200000000000728,
+      "max": 6.799999999999272
+    },
+    "cpuMs": {
+      "p50": 3.099999999627471,
+      "p95": 5.800000000745058,
+      "p99": 7.400000000372529
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5045,
+    "signalChanges": 10862,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "room": "gallery",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10019.099999999627,
+    "frames": 1653,
+    "fps": 164.98487888134278,
+    "perSecond": [
+      164,
+      166,
+      164,
+      166,
+      165,
+      165,
+      164,
+      166,
+      165,
+      165
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.100000000000364,
+      "p99": 6.200000000000728,
+      "max": 6.300000000000182
+    },
+    "cpuMs": {
+      "p50": 3.600000001490116,
+      "p95": 6.800000000745058,
+      "p99": 8
+    },
+    "over25ms": 0,
+    "pointerEvents": 596,
+    "roomMoves": 596,
+    "geometryChanges": 5145,
+    "signalChanges": 10932,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "room": "particles",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10004.5,
+    "frames": 1650,
+    "fps": 164.92578339747115,
+    "perSecond": [
+      165,
+      165,
+      163,
+      166,
+      165,
+      165,
+      165,
+      165,
+      164,
+      166
+    ],
+    "minSecond": 163,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999999818,
+      "p99": 6.200000000000728,
+      "max": 12.099999999999454
+    },
+    "cpuMs": {
+      "p50": 3.299999998882413,
+      "p95": 5.900000000372529,
+      "p99": 7.599999999627471
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5055,
+    "signalChanges": 10007,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "room": "materials",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10001.599999999627,
+    "frames": 1645,
+    "fps": 164.47368421053244,
+    "perSecond": [
+      162,
+      164,
+      166,
+      164,
+      166,
+      164,
+      163,
+      165,
+      165,
+      166
+    ],
+    "minSecond": 162,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999999818,
+      "p99": 6.200000000000728,
+      "max": 12.199999999999818
+    },
+    "cpuMs": {
+      "p50": 3.400000000372529,
+      "p95": 7.5,
+      "p99": 9.699999999254942
+    },
+    "over25ms": 0,
+    "pointerEvents": 597,
+    "roomMoves": 597,
+    "geometryChanges": 5055,
+    "signalChanges": 10642,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "room": "sound",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10006.900000000373,
+    "frames": 1651,
+    "fps": 164.98615954990441,
+    "perSecond": [
+      165,
+      164,
+      166,
+      164,
+      165,
+      166,
+      165,
+      164,
+      166,
+      165
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999998909,
+      "p99": 6.200000000000728,
+      "max": 6.599999999999454
+    },
+    "cpuMs": {
+      "p50": 3.799999998882413,
+      "p95": 6.799999998882413,
+      "p99": 7.899999998509884
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5080,
+    "signalChanges": 10440,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "room": "monitor",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "visible": true,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "headed": false,
+    "trajectory": {
+      "amplitudePx": 80,
+      "periodSeconds": 1.5
+    },
+    "durationMs": 10003.300000000745,
+    "frames": 1650,
+    "fps": 164.94556796256006,
+    "perSecond": [
+      164,
+      166,
+      164,
+      165,
+      166,
+      164,
+      165,
+      166,
+      164,
+      165
+    ],
+    "minSecond": 164,
+    "frameMs": {
+      "p50": 6.099999999999454,
+      "p95": 6.199999999998909,
+      "p99": 6.200000000000728,
+      "max": 6.5
+    },
+    "cpuMs": {
+      "p50": 2.700000001117587,
+      "p95": 5.200000001117587,
+      "p99": 6.700000001117587
+    },
+    "over25ms": 0,
+    "pointerEvents": 600,
+    "roomMoves": 600,
+    "geometryChanges": 5030,
+    "signalChanges": 10732,
+    "activeDrag": true,
+    "view": "room",
+    "longTasks": [],
+    "errors": []
+  }
+]

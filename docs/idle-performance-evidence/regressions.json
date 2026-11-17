@@ -1,0 +1,1193 @@
+[
+  {
+    "name": "monitor",
+    "reducedMotion": "no-preference",
+    "passed": 11,
+    "failed": 0,
+    "results": [
+      {
+        "name": "App is initially hidden and inert",
+        "passed": true
+      },
+      {
+        "name": "Click starts camera travel, not external navigation",
+        "passed": true
+      },
+      {
+        "name": "Monitor is ready for interactive HTML",
+        "passed": true
+      },
+      {
+        "name": "Focus enters return button",
+        "passed": true
+      },
+      {
+        "name": "Return button is inside the monitor screen",
+        "passed": true
+      },
+      {
+        "name": "App matches physical screen aspect",
+        "passed": true,
+        "width": 640,
+        "height": 405.328125
+      },
+      {
+        "name": "Application surface accepts interactive controls",
+        "passed": true
+      },
+      {
+        "name": "In-screen return restores room and hides app",
+        "passed": true
+      },
+      {
+        "name": "Focus returns to room button",
+        "passed": true
+      },
+      {
+        "name": "Focus restoration schedules only one animation frame",
+        "passed": true,
+        "queued": 1
+      },
+      {
+        "name": "Escape returns to overview",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "server",
+    "reducedMotion": "no-preference",
+    "passed": 23,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Contact starts hidden, inert and out of the tab order",
+        "passed": true
+      },
+      {
+        "name": "Both objects can be activated in overview",
+        "passed": true
+      },
+      {
+        "name": "Server and room have different clickable hulls",
+        "passed": true
+      },
+      {
+        "name": "Clicking the visible JP lettering targets the server, not the computer",
+        "passed": true
+      },
+      {
+        "name": "Server hover is independent of room",
+        "passed": true
+      },
+      {
+        "name": "Hover responds with motion unless reduced motion is enabled",
+        "passed": true
+      },
+      {
+        "name": "Click starts the server camera transition",
+        "passed": true
+      },
+      {
+        "name": "During transition room does not open",
+        "passed": true
+      },
+      {
+        "name": "Server form is interactive only after arrival",
+        "passed": true
+      },
+      {
+        "name": "Both scene buttons are disabled while inside server",
+        "passed": true
+      },
+      {
+        "name": "Focus enters the in-server return button",
+        "passed": true
+      },
+      {
+        "name": "Only server announces expanded state",
+        "passed": true
+      },
+      {
+        "name": "Contact surface matches physical rack proportions",
+        "passed": true
+      },
+      {
+        "name": "Actual camera faces the JP side along +Z, not the monitor along +X",
+        "passed": true
+      },
+      {
+        "name": "HTML matches the projected JP panel, not an unrelated screen",
+        "passed": true
+      },
+      {
+        "name": "Return stays inside physical contact surface",
+        "passed": true
+      },
+      {
+        "name": "Physical contact surface accepts keyboard focus",
+        "passed": true
+      },
+      {
+        "name": "Submit availability matches recipient configuration",
+        "passed": true
+      },
+      {
+        "name": "Escape restores overview and original focus",
+        "passed": true
+      },
+      {
+        "name": "Keyboard activation reopens server and preserves draft",
+        "passed": true
+      },
+      {
+        "name": "Room and ASCII still work after visiting server",
+        "passed": true
+      },
+      {
+        "name": "Room return restores room button focus",
+        "passed": true
+      },
+      {
+        "name": "Escape safely reverses an unfinished server transition",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "server",
+    "reducedMotion": "reduce",
+    "passed": 23,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Contact starts hidden, inert and out of the tab order",
+        "passed": true
+      },
+      {
+        "name": "Both objects can be activated in overview",
+        "passed": true
+      },
+      {
+        "name": "Server and room have different clickable hulls",
+        "passed": true
+      },
+      {
+        "name": "Clicking the visible JP lettering targets the server, not the computer",
+        "passed": true
+      },
+      {
+        "name": "Server hover is independent of room",
+        "passed": true
+      },
+      {
+        "name": "Hover responds with motion unless reduced motion is enabled",
+        "passed": true
+      },
+      {
+        "name": "Click starts the server camera transition",
+        "passed": true
+      },
+      {
+        "name": "During transition room does not open",
+        "passed": true
+      },
+      {
+        "name": "Server form is interactive only after arrival",
+        "passed": true
+      },
+      {
+        "name": "Both scene buttons are disabled while inside server",
+        "passed": true
+      },
+      {
+        "name": "Focus enters the in-server return button",
+        "passed": true
+      },
+      {
+        "name": "Only server announces expanded state",
+        "passed": true
+      },
+      {
+        "name": "Contact surface matches physical rack proportions",
+        "passed": true
+      },
+      {
+        "name": "Actual camera faces the JP side along +Z, not the monitor along +X",
+        "passed": true
+      },
+      {
+        "name": "HTML matches the projected JP panel, not an unrelated screen",
+        "passed": true
+      },
+      {
+        "name": "Return stays inside physical contact surface",
+        "passed": true
+      },
+      {
+        "name": "Physical contact surface accepts keyboard focus",
+        "passed": true
+      },
+      {
+        "name": "Submit availability matches recipient configuration",
+        "passed": true
+      },
+      {
+        "name": "Escape restores overview and original focus",
+        "passed": true
+      },
+      {
+        "name": "Keyboard activation reopens server and preserves draft",
+        "passed": true
+      },
+      {
+        "name": "Room and ASCII still work after visiting server",
+        "passed": true
+      },
+      {
+        "name": "Room return restores room button focus",
+        "passed": true
+      },
+      {
+        "name": "Escape safely reverses an unfinished server transition",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "contact",
+    "reducedMotion": "no-preference",
+    "passed": 19,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Configured form is enabled and setup notice is hidden",
+        "passed": true
+      },
+      {
+        "name": "Whitespace-only name is rejected without networking",
+        "passed": true
+      },
+      {
+        "name": "Native email validation prevents network requests",
+        "passed": true
+      },
+      {
+        "name": "Honeypot blocks submission without clearing draft",
+        "passed": true
+      },
+      {
+        "name": "Transport receives only the configured endpoint and reply address",
+        "passed": true
+      },
+      {
+        "name": "Rejected API keeps all user fields",
+        "passed": true
+      },
+      {
+        "name": "Provider markup is never interpreted as HTML",
+        "passed": true
+      },
+      {
+        "name": "Transport receives only the configured endpoint and reply address",
+        "passed": true
+      },
+      {
+        "name": "Network error restores editable inputs and retry button",
+        "passed": true
+      },
+      {
+        "name": "Transport receives only the configured endpoint and reply address",
+        "passed": true
+      },
+      {
+        "name": "Pending request disables fields and indicates busy state",
+        "passed": true
+      },
+      {
+        "name": "Repeated submits cannot send duplicate requests",
+        "passed": true
+      },
+      {
+        "name": "Late completion does not steal focus from the scene",
+        "passed": true
+      },
+      {
+        "name": "Only confirmed success resets user data",
+        "passed": true
+      },
+      {
+        "name": "Success describes acceptance, not guaranteed delivery",
+        "passed": true
+      },
+      {
+        "name": "Button is enabled after completion",
+        "passed": true
+      },
+      {
+        "name": "Transport receives only the configured endpoint and reply address",
+        "passed": true
+      },
+      {
+        "name": "Timeout preserves draft and allows manual retry",
+        "passed": true
+      },
+      {
+        "name": "Timeout does not retry automatically",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "ascii",
+    "reducedMotion": "no-preference",
+    "passed": 59,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Converter title removed without removing download",
+        "passed": true
+      },
+      {
+        "name": "Toolbar branding removed without removing return",
+        "passed": true
+      },
+      {
+        "name": "Initial privacy notice is removed",
+        "passed": true
+      },
+      {
+        "name": "Remix controls are hidden until an image exists",
+        "passed": true
+      },
+      {
+        "name": "Upload controls are above download controls",
+        "passed": true
+      },
+      {
+        "name": "PNG file picker produces visible ASCII preview",
+        "passed": true
+      },
+      {
+        "name": "Download button is removed from the visible interface",
+        "passed": true
+      },
+      {
+        "name": "All converter controls share one line",
+        "passed": true,
+        "tops": [
+          186.65625,
+          186.65625,
+          186.65625
+        ]
+      },
+      {
+        "name": "Controls stay on one line at annotated monitor width",
+        "passed": true,
+        "tops": [
+          186.65625,
+          186.65625,
+          186.65625
+        ]
+      },
+      {
+        "name": "Remix opens settings without changing generated art",
+        "passed": true
+      },
+      {
+        "name": "Brightness slider remixes the actual preview",
+        "passed": true
+      },
+      {
+        "name": "Reset restores original characters and colors",
+        "passed": true
+      },
+      {
+        "name": "Detail slider resamples original image at new width",
+        "passed": true
+      },
+      {
+        "name": "Vertical stretch changes rendered row count",
+        "passed": true
+      },
+      {
+        "name": "Invert changes generated characters",
+        "passed": true
+      },
+      {
+        "name": "Matrix preset updates palette and preview background",
+        "passed": true
+      },
+      {
+        "name": "Export follows current remixed preview",
+        "passed": true
+      },
+      {
+        "name": "Closing Remix keeps edited image",
+        "passed": true
+      },
+      {
+        "name": "Preview characters fill available width instead of shrinking to height",
+        "passed": true,
+        "font": 10.4651,
+        "width": 758
+      },
+      {
+        "name": "Download preserves exact ASCII text inside colored HTML",
+        "passed": true
+      },
+      {
+        "name": "Output preserves aspect ratio and all line widths",
+        "passed": true
+      },
+      {
+        "name": "Preview renders original red green and blue character colors",
+        "passed": true
+      },
+      {
+        "name": "Color download is a standalone HTML matching visible characters",
+        "passed": true
+      },
+      {
+        "name": "Live edit #remix-contrast changes rendered glyphs or colors",
+        "passed": true
+      },
+      {
+        "name": "Live edit #remix-saturation changes rendered glyphs or colors",
+        "passed": true
+      },
+      {
+        "name": "Live edit #remix-edges changes rendered glyphs or colors",
+        "passed": true
+      },
+      {
+        "name": "Live edit #remix-palette changes rendered glyphs or colors",
+        "passed": true
+      },
+      {
+        "name": "Live edit #remix-ramp changes rendered glyphs or colors",
+        "passed": true
+      },
+      {
+        "name": "Background edit changes preview and exported background",
+        "passed": true
+      },
+      {
+        "name": "Rapid edits retain the latest setting",
+        "passed": true
+      },
+      {
+        "name": "HTML PNG JPG TXT export choices exist",
+        "passed": true
+      },
+      {
+        "name": "TXT export matches ASCII characters",
+        "passed": true
+      },
+      {
+        "name": "PNG export is a large colored ASCII image",
+        "passed": true,
+        "width": 1489,
+        "height": 768,
+        "red": 30000,
+        "blue": 39600
+      },
+      {
+        "name": "JPG export is a large colored ASCII image",
+        "passed": true,
+        "width": 1489,
+        "height": 768,
+        "red": 12435,
+        "blue": 17715
+      },
+      {
+        "name": "Pasting a screenshot converts it and enables download",
+        "passed": true,
+        "prevented": true,
+        "downloadName": "schowek-ascii.html",
+        "state": "ready",
+        "open": "true",
+        "items": [
+          {
+            "kind": "file",
+            "type": "image/png",
+            "name": "schowek.png"
+          }
+        ]
+      },
+      {
+        "name": "Paste button reads an image and converts it",
+        "passed": true
+      },
+      {
+        "name": "Clipboard permission denial offers Ctrl+V without losing result",
+        "passed": true
+      },
+      {
+        "name": "Empty clipboard gives actionable message",
+        "passed": true
+      },
+      {
+        "name": "Clipboard denied does not cancel a pending real upload",
+        "passed": true,
+        "state": "ready",
+        "status": "",
+        "downloadName": "pending-denied-ascii.html"
+      },
+      {
+        "name": "Clipboard unavailable does not cancel a pending real upload",
+        "passed": true,
+        "state": "ready",
+        "status": "",
+        "downloadName": "pending-unavailable-ascii.html"
+      },
+      {
+        "name": "Clipboard empty does not cancel a pending real upload",
+        "passed": true,
+        "state": "ready",
+        "status": "",
+        "downloadName": "pending-empty-ascii.html"
+      },
+      {
+        "name": "Late clipboard image cannot overwrite a newer upload",
+        "passed": true
+      },
+      {
+        "name": "Late clipboard blob cannot overwrite a newer upload",
+        "passed": true
+      },
+      {
+        "name": "Late clipboard empty cannot overwrite a newer upload",
+        "passed": true
+      },
+      {
+        "name": "Late clipboard denied cannot overwrite a newer upload",
+        "passed": true
+      },
+      {
+        "name": "Latest paste image supersedes an older clipboard read",
+        "passed": true
+      },
+      {
+        "name": "Latest paste empty supersedes an older clipboard read",
+        "passed": true
+      },
+      {
+        "name": "Latest paste unavailable supersedes an older clipboard read",
+        "passed": true
+      },
+      {
+        "name": "Normal text paste is not intercepted",
+        "passed": true
+      },
+      {
+        "name": "JPEG supported",
+        "passed": true
+      },
+      {
+        "name": "SVG drag-and-drop converts and replaces previous result",
+        "passed": true
+      },
+      {
+        "name": "SVG sanitization removes script, remote resources, CSS and event handlers",
+        "passed": true
+      },
+      {
+        "name": "Corrupt image shows error without stale output",
+        "passed": true
+      },
+      {
+        "name": "Non-image files rejected",
+        "passed": true
+      },
+      {
+        "name": "File size limit enforced",
+        "passed": true
+      },
+      {
+        "name": "Recovers after invalid upload",
+        "passed": true
+      },
+      {
+        "name": "Converter retains result after leaving monitor",
+        "passed": true
+      },
+      {
+        "name": "Pasting outside monitor does not start conversion",
+        "passed": true
+      },
+      {
+        "name": "Converter reopens with previous result",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "chair",
+    "reducedMotion": "no-preference",
+    "passed": 3,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Chair rotates left and slides to the right simultaneously",
+        "passed": true,
+        "pose": [
+          0.841545288047131,
+          0.39828860961009255,
+          -0.9957215240252314
+        ]
+      },
+      {
+        "name": "Chair motion changes actual pixels at the same camera position",
+        "passed": true,
+        "changed": 9295
+      },
+      {
+        "name": "Return restores chair exactly",
+        "passed": true,
+        "pose": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "monitor-logo",
+    "reducedMotion": "no-preference",
+    "passed": 3,
+    "failed": 0,
+    "results": [
+      {
+        "name": "JP and brackets stay visible in overview",
+        "passed": true
+      },
+      {
+        "name": "JP and brackets are hidden during zoom",
+        "passed": true,
+        "changedPixels": 7487
+      },
+      {
+        "name": "JP and brackets return after zooming out",
+        "passed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "animation",
+    "reducedMotion": "no-preference",
+    "passed": 14,
+    "failed": 0,
+    "results": [
+      {
+        "name": "Green travels on the actual deforming tube",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "Pulse advances at 5 cable units/s despite deformation",
+        "passed": true
+      },
+      {
+        "name": "ASCII replies in cyan on its current cable",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "Receiver only flashes after the outgoing front reaches it",
+        "passed": true
+      },
+      {
+        "name": "Crystal receives the returning beam color",
+        "passed": true,
+        "error": 2.6303333333333305
+      },
+      {
+        "name": "Flexible cable really changes shape under gravity",
+        "passed": true
+      },
+      {
+        "name": "Overhead lamp",
+        "passed": true,
+        "p": [
+          2.148,
+          3.1,
+          -0.36000000000000004
+        ],
+        "received": 3.6303333333333376,
+        "restored": 11.219999999999999
+      },
+      {
+        "name": "Overhead lamp",
+        "passed": true,
+        "p": [
+          2.148,
+          3.1,
+          -0.36000000000000004
+        ],
+        "received": 3.6303333333333376,
+        "restored": 11.219999999999999
+      },
+      {
+        "name": "Monitor lettering",
+        "passed": true,
+        "p": [
+          3.0010000000000003,
+          1.84,
+          -0.272
+        ],
+        "received": 1.963666666666671,
+        "restored": 7.886666666666666
+      },
+      {
+        "name": "Monitor lettering",
+        "passed": true,
+        "p": [
+          3.0010000000000003,
+          1.84,
+          -0.272
+        ],
+        "received": 1.963666666666671,
+        "restored": 7.886666666666666
+      },
+      {
+        "name": "Wall neon ASCI ART",
+        "passed": true,
+        "p": [
+          2.6750000000000003,
+          3.04,
+          -2.27
+        ],
+        "received": 6.630333333333337,
+        "restored": 0.21999999999999886
+      },
+      {
+        "name": "Wall neon ASCI ART",
+        "passed": true,
+        "p": [
+          2.6750000000000003,
+          3.04,
+          -2.27
+        ],
+        "received": 6.630333333333337,
+        "restored": 0.21999999999999886
+      },
+      {
+        "name": "Floor LED",
+        "passed": true,
+        "p": [
+          4.985,
+          0.1,
+          2.68
+        ],
+        "received": 5.630333333333337,
+        "restored": 8.219999999999999
+      },
+      {
+        "name": "Floor LED",
+        "passed": true,
+        "p": [
+          4.985,
+          0.1,
+          2.68
+        ],
+        "received": 5.630333333333337,
+        "restored": 8.219999999999999
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "lighting",
+    "reducedMotion": "no-preference",
+    "passed": 3,
+    "failed": 0,
+    "results": [
+      {
+        "name": "An emitter fully hidden behind an opaque wall contributes no visible glow",
+        "passed": true,
+        "changedPixels": 0,
+        "maxDifference": 0
+      },
+      {
+        "name": "Soft bloom around an unoccluded source is preserved",
+        "passed": true,
+        "haloPixels": 5124
+      },
+      {
+        "name": "Unoccluded green sources remain visible",
+        "passed": true,
+        "greenPixels": 2916
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "interaction-flash",
+    "reducedMotion": "reduce",
+    "passed": 1,
+    "failed": 0,
+    "changedDuringClick": 1217014,
+    "stuckChannels": 0,
+    "remainingFrames": 0,
+    "errors": []
+  },
+  {
+    "name": "cables",
+    "reducedMotion": "no-preference",
+    "passed": 36,
+    "failed": 0,
+    "results": [
+      {
+        "name": "gallery: real GPU tube starts at its own shelf",
+        "passed": true
+      },
+      {
+        "name": "gallery: real GPU tube ends behind its monitor",
+        "passed": true
+      },
+      {
+        "name": "gallery: round tube has continuous finite arc coordinates",
+        "passed": true
+      },
+      {
+        "name": "gallery: green outgoing surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.3333333333333333,
+        "room": 8.630333333333338,
+        "causal": true,
+        "lastFront": {
+          "time": 18.7,
+          "distance": 18.5400234694725,
+          "length": 18.95823860168457
+        }
+      },
+      {
+        "name": "gallery: own-color reply surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.3333333333333333,
+        "room": 8.630333333333338,
+        "causal": true,
+        "lastFront": {
+          "time": 18.7,
+          "distance": 18.5400234694725,
+          "length": 18.95823860168457
+        }
+      },
+      {
+        "name": "gallery: green room receipt pixels",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.3333333333333333,
+        "room": 8.630333333333338,
+        "causal": true,
+        "lastFront": {
+          "time": 18.7,
+          "distance": 18.5400234694725,
+          "length": 18.95823860168457
+        }
+      },
+      {
+        "name": "gallery: no early room receipt",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.3333333333333333,
+        "room": 8.630333333333338,
+        "causal": true,
+        "lastFront": {
+          "time": 18.7,
+          "distance": 18.5400234694725,
+          "length": 18.95823860168457
+        }
+      },
+      {
+        "name": "particles: real GPU tube starts at its own shelf",
+        "passed": true
+      },
+      {
+        "name": "particles: real GPU tube ends behind its monitor",
+        "passed": true
+      },
+      {
+        "name": "particles: round tube has continuous finite arc coordinates",
+        "passed": true
+      },
+      {
+        "name": "particles: green outgoing surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.03633333333333629,
+        "room": 8.96366666666667,
+        "causal": true,
+        "lastFront": {
+          "time": 18.5,
+          "distance": 17.540023469472505,
+          "length": 17.92616081237793
+        }
+      },
+      {
+        "name": "particles: own-color reply surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.03633333333333629,
+        "room": 8.96366666666667,
+        "causal": true,
+        "lastFront": {
+          "time": 18.5,
+          "distance": 17.540023469472505,
+          "length": 17.92616081237793
+        }
+      },
+      {
+        "name": "particles: green room receipt pixels",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.03633333333333629,
+        "room": 8.96366666666667,
+        "causal": true,
+        "lastFront": {
+          "time": 18.5,
+          "distance": 17.540023469472505,
+          "length": 17.92616081237793
+        }
+      },
+      {
+        "name": "particles: no early room receipt",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.03633333333333629,
+        "room": 8.96366666666667,
+        "causal": true,
+        "lastFront": {
+          "time": 18.5,
+          "distance": 17.540023469472505,
+          "length": 17.92616081237793
+        }
+      },
+      {
+        "name": "materials: real GPU tube starts at its own shelf",
+        "passed": true
+      },
+      {
+        "name": "materials: real GPU tube ends behind its monitor",
+        "passed": true
+      },
+      {
+        "name": "materials: round tube has continuous finite arc coordinates",
+        "passed": true
+      },
+      {
+        "name": "materials: green outgoing surface streak",
+        "passed": true,
+        "send": 2.6303333333333376,
+        "reply": 0.4796666666666596,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 18.9,
+          "distance": 19.540023469472498,
+          "length": 19.88692855834961
+        }
+      },
+      {
+        "name": "materials: own-color reply surface streak",
+        "passed": true,
+        "send": 2.6303333333333376,
+        "reply": 0.4796666666666596,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 18.9,
+          "distance": 19.540023469472498,
+          "length": 19.88692855834961
+        }
+      },
+      {
+        "name": "materials: green room receipt pixels",
+        "passed": true,
+        "send": 2.6303333333333376,
+        "reply": 0.4796666666666596,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 18.9,
+          "distance": 19.540023469472498,
+          "length": 19.88692855834961
+        }
+      },
+      {
+        "name": "materials: no early room receipt",
+        "passed": true,
+        "send": 2.6303333333333376,
+        "reply": 0.4796666666666596,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 18.9,
+          "distance": 19.540023469472498,
+          "length": 19.88692855834961
+        }
+      },
+      {
+        "name": "sound: real GPU tube starts at its own shelf",
+        "passed": true
+      },
+      {
+        "name": "sound: real GPU tube ends behind its monitor",
+        "passed": true
+      },
+      {
+        "name": "sound: round tube has continuous finite arc coordinates",
+        "passed": true
+      },
+      {
+        "name": "sound: green outgoing surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.5566666666666625,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 20.6,
+          "distance": 27.762284311390868,
+          "length": 27.762285232543945
+        }
+      },
+      {
+        "name": "sound: own-color reply surface streak",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.5566666666666625,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 20.6,
+          "distance": 27.762284311390868,
+          "length": 27.762285232543945
+        }
+      },
+      {
+        "name": "sound: green room receipt pixels",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.5566666666666625,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 20.6,
+          "distance": 27.762284311390868,
+          "length": 27.762285232543945
+        }
+      },
+      {
+        "name": "sound: no early room receipt",
+        "passed": true,
+        "send": 0.6303333333333375,
+        "reply": 0.5566666666666625,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 20.6,
+          "distance": 27.762284311390868,
+          "length": 27.762285232543945
+        }
+      },
+      {
+        "name": "monitor: real GPU tube starts at its own shelf",
+        "passed": true
+      },
+      {
+        "name": "monitor: real GPU tube ends behind its monitor",
+        "passed": true
+      },
+      {
+        "name": "monitor: round tube has continuous finite arc coordinates",
+        "passed": true
+      },
+      {
+        "name": "monitor: green outgoing surface streak",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "monitor: own-color reply surface streak",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "monitor: green room receipt pixels",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "monitor: no early room receipt",
+        "passed": true,
+        "send": 0.7436666666666673,
+        "reply": 0.11333333333333447,
+        "room": 6.630333333333337,
+        "causal": true,
+        "lastFront": {
+          "time": 17.3,
+          "distance": 11.049852442290263,
+          "length": 11.04985237121582
+        }
+      },
+      {
+        "name": "Server crystal matches the actual received beam",
+        "passed": true,
+        "error": 2.6303333333333305
+      }
+    ],
+    "errors": []
+  }
+]

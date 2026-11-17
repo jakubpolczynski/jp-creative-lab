@@ -1,0 +1,152 @@
+[
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "canvas": [
+      1440,
+      1000
+    ],
+    "visible": true,
+    "reduced": false,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "screen": [
+      1440,
+      1000
+    ],
+    "headed": false,
+    "hover": null,
+    "reference": {
+      "cadence": "60Hz slots on native RAF",
+      "nativeFps": 154.90318550905684,
+      "fps": 58.21361648969394,
+      "p95": 18.800000000000068,
+      "p99": 24.299999999999955
+    },
+    "durationMs": 20005.099999999627,
+    "frames": 3199,
+    "fps": 159.9092231481002,
+    "perSecond": [
+      160,
+      157,
+      160,
+      163,
+      159,
+      161,
+      160,
+      161,
+      159,
+      161,
+      158,
+      160,
+      164,
+      160,
+      161,
+      158,
+      160,
+      161,
+      158,
+      157
+    ],
+    "minSecond": 157,
+    "frameMs": {
+      "p50": 6.099999999998545,
+      "p95": 6.299999999999272,
+      "p99": 12.100000000000364,
+      "max": 18.300000000000182
+    },
+    "cpuMs": {
+      "p50": 3.199999999254942,
+      "p95": 4.200000001117587,
+      "p99": 5
+    },
+    "gpuMs": {
+      "p50": 2.4832,
+      "p95": 8.418304
+    },
+    "over25ms": 0,
+    "geometryChanges": 11954,
+    "signalChanges": 19278,
+    "uploads": 37468,
+    "uploadMB": 835.0859069824219,
+    "longTasks": [],
+    "errors": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "canvas": [
+      1920,
+      1080
+    ],
+    "visible": true,
+    "reduced": false,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "screen": [
+      1920,
+      1080
+    ],
+    "headed": false,
+    "hover": null,
+    "reference": {
+      "cadence": "60Hz slots on native RAF",
+      "nativeFps": 158.24604384890378,
+      "fps": 59.99850003749906,
+      "p95": 18.399999999999977,
+      "p99": 19.199999999999818
+    },
+    "durationMs": 20021.700000001118,
+    "frames": 3296,
+    "fps": 164.6213857964017,
+    "perSecond": [
+      164,
+      166,
+      160,
+      163,
+      165,
+      165,
+      165,
+      165,
+      165,
+      164,
+      166,
+      164,
+      166,
+      165,
+      165,
+      165,
+      164,
+      166,
+      165,
+      165
+    ],
+    "minSecond": 160,
+    "frameMs": {
+      "p50": 6.099999999998545,
+      "p95": 6.200000000000728,
+      "p99": 6.200000000000728,
+      "max": 12.100000000000364
+    },
+    "cpuMs": {
+      "p50": 3,
+      "p95": 4.299999998882413,
+      "p99": 5.099999999627471
+    },
+    "gpuMs": {
+      "p50": 2.226176,
+      "p95": 7.457792
+    },
+    "over25ms": 0,
+    "geometryChanges": 11990,
+    "signalChanges": 19691,
+    "uploads": 37727,
+    "uploadMB": 831.1481323242188,
+    "longTasks": [],
+    "errors": []
+  }
+]

@@ -1,0 +1,77 @@
+[
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti (0x00002782) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "canvas": [
+      1440,
+      1000
+    ],
+    "visible": true,
+    "reduced": false,
+    "script": "http://localhost:8000/viewer.62ca3dcbbe48.js",
+    "screen": [
+      1440,
+      1000
+    ],
+    "headed": true,
+    "hover": "gallery",
+    "reference": {
+      "cadence": "60Hz slots on native RAF",
+      "nativeFps": 88.47566919097248,
+      "fps": 51.81087778139314,
+      "p95": 20.699999999999932,
+      "p99": 20.700000000000273
+    },
+    "durationMs": 20013,
+    "frames": 2754,
+    "fps": 137.6105531404587,
+    "perSecond": [
+      49,
+      48,
+      56,
+      49,
+      102,
+      164,
+      165,
+      138,
+      165,
+      165,
+      166,
+      165,
+      165,
+      165,
+      165,
+      165,
+      165,
+      165,
+      165,
+      165
+    ],
+    "minSecond": 48,
+    "frameMs": {
+      "p50": 6.099999999998545,
+      "p95": 20.599999999999454,
+      "p99": 20.69999999999891,
+      "max": 27.799999999999272
+    },
+    "cpuMs": {
+      "p50": 3.599999999627471,
+      "p95": 7.199999999254942,
+      "p99": 9.599999999627471
+    },
+    "gpuMs": {
+      "p50": 2.454528,
+      "p95": 3.530752
+    },
+    "over25ms": 1,
+    "geometryChanges": 10895,
+    "signalChanges": 14903,
+    "uploads": 34197,
+    "uploadMB": 755.9761047363281,
+    "longTasks": [],
+    "errors": []
+  }
+]

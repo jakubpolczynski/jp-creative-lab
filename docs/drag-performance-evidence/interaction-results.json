@@ -1,0 +1,50 @@
+[
+  {
+    "viewport": 1440,
+    "motion": "reduce",
+    "fiveRoomsDragged": true,
+    "touch": false,
+    "noAccidentalOpen": true,
+    "keyboardCancel": true,
+    "keyboardPlace": true,
+    "movedMonitorAlignment": true,
+    "secondTouchCancel": false,
+    "errors": []
+  },
+  {
+    "viewport": 390,
+    "motion": "reduce",
+    "fiveRoomsDragged": true,
+    "touch": true,
+    "noAccidentalOpen": true,
+    "keyboardCancel": true,
+    "keyboardPlace": true,
+    "movedMonitorAlignment": true,
+    "secondTouchCancel": true,
+    "errors": []
+  },
+  {
+    "viewport": 844,
+    "motion": "reduce",
+    "fiveRoomsDragged": true,
+    "touch": false,
+    "noAccidentalOpen": true,
+    "keyboardCancel": true,
+    "keyboardPlace": true,
+    "movedMonitorAlignment": true,
+    "secondTouchCancel": false,
+    "errors": []
+  },
+  {
+    "viewport": 1100,
+    "motion": "no-preference",
+    "fiveRoomsDragged": true,
+    "touch": false,
+    "noAccidentalOpen": true,
+    "keyboardCancel": true,
+    "keyboardPlace": true,
+    "movedMonitorAlignment": true,
+    "secondTouchCancel": false,
+    "errors": []
+  }
+]

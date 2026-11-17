@@ -1,0 +1,106 @@
+[
+  {
+    "viewport": 1440,
+    "experiment": "particles",
+    "jp": 17627,
+    "wave": 15106,
+    "repulsion": 6425
+  },
+  {
+    "viewport": 1440,
+    "experiment": "materials",
+    "hologram": 74358,
+    "wire": 73760
+  },
+  {
+    "viewport": 1440,
+    "experiment": "sound",
+    "contexts": 1,
+    "sources": 5,
+    "energy": 0.007884218357503414
+  },
+  {
+    "viewport": 1440,
+    "allFourRooms": true,
+    "monitorCamera": true,
+    "physicalScreenAlignment": true,
+    "asciiScreenAlignment": true,
+    "effectsClippedInsideMonitor": true,
+    "oldDestinations": true,
+    "externalRequests": 0,
+    "errors": []
+  },
+  {
+    "viewport": 390,
+    "experiment": "particles",
+    "jp": 3339,
+    "wave": 2587,
+    "repulsion": 693
+  },
+  {
+    "viewport": 390,
+    "experiment": "materials",
+    "hologram": 5434,
+    "wire": 5404
+  },
+  {
+    "viewport": 390,
+    "experiment": "sound",
+    "contexts": 1,
+    "sources": 2,
+    "energy": 0.003986693453043699
+  },
+  {
+    "viewport": 390,
+    "allFourRooms": true,
+    "monitorCamera": true,
+    "physicalScreenAlignment": true,
+    "asciiScreenAlignment": true,
+    "effectsClippedInsideMonitor": true,
+    "oldDestinations": true,
+    "externalRequests": 0,
+    "errors": []
+  },
+  {
+    "viewport": 844,
+    "experiment": "particles",
+    "jp": 7082,
+    "wave": 5632,
+    "repulsion": 1254
+  },
+  {
+    "viewport": 844,
+    "experiment": "materials",
+    "hologram": 8002,
+    "wire": 7952
+  },
+  {
+    "viewport": 844,
+    "experiment": "sound",
+    "contexts": 1,
+    "sources": 2,
+    "energy": 0.0024064749013632536
+  },
+  {
+    "viewport": 844,
+    "allFourRooms": true,
+    "monitorCamera": true,
+    "physicalScreenAlignment": true,
+    "asciiScreenAlignment": true,
+    "effectsClippedInsideMonitor": true,
+    "oldDestinations": true,
+    "externalRequests": 0,
+    "errors": []
+  },
+  {
+    "animation": true,
+    "interruptedEntry": true,
+    "keyboardAllFour": true,
+    "focusRestored": true,
+    "responsiveParticleBudget": true,
+    "contextLossStopsAudio": true
+  },
+  {
+    "unsupportedAudioGraceful": true
+  }
+]

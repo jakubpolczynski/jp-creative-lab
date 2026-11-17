@@ -22,14 +22,19 @@ cyjanowym, galeria czerwonym, cząsteczki różowym, materiały bursztynowym,
 dźwięk fioletowym. Każda wiązka porusza się z prędkością 5 jednostek sceny/s;
 światła odbiorcy rozbłyskują dopiero po dotarciu sygnału. Obudowy zachowują
 swój kolor. Trasy kabli omijają ściany i kończą się z tyłu monitorów.
-Animacja respektuje ograniczenie ruchu, pauzuje w niewidocznej karcie
-i działa maksymalnie w 30 klatkach/s.
+Animacja respektuje ograniczenie ruchu i pauzuje w niewidocznej karcie.
+Usunięto limit 30 FPS: renderer pracuje w natywnym rytmie RAF, a fizyka
+nieruchomego świata ma stały krok 120 Hz. Cel idle to co najmniej 60 FPS,
+z nadal działającymi kablami, sygnałami i bloom.
+Pomiar sprzętowy i sposób powtórzenia: [docs/idle-performance.md](docs/idle-performance.md).
+Również ciągłe przenoszenie wszystkich pięciu pokoi ma osobny pomiar 60 FPS:
+[docs/drag-performance.md](docs/drag-performance.md).
 
 ## Aktualizacja pamięci podręcznej
 
 Poprzednia wersja używała niezmiennego adresu `room-server.glb`, z rocznym cache i `force-cache`. To mogło powodować wyświetlanie starego modelu po kolejnych wdrożeniach.
 
-W tym wydaniu model ma nazwę opartą na SHA-1: `room-server.44b95fcd4e41.glb`. Kod renderera to `viewer.606ceb00e1e1.js`. Strona główna wymaga rewalidacji. Przy każdej przyszłej zmianie GLB **wygeneruj nową nazwę na podstawie jego zawartości**.
+W tym wydaniu model ma nazwę opartą na SHA-1: `room-server.44b95fcd4e41.glb`. Kod renderera to `viewer.62ca3dcbbe48.js`. Strona główna wymaga rewalidacji. Przy każdej przyszłej zmianie GLB **wygeneruj nową nazwę na podstawie jego zawartości**.
 Pełny świat używa z GLB wyłącznie racka; wszystkie pięć pokoi i ich kable
 powstają ze wspólnego modelu proceduralnego. Stary pokój i kabel z GLB
 nie są rysowane ani w kolorze, ani w przebiegu bloom. Plik GLB nie został zmieniony.
@@ -37,7 +42,7 @@ nie są rysowane ani w kolorze, ani w przebiegu bloom. Plik GLB nie został zmie
 ## Pliki produkcyjne
 
 - `index.html` — pojedynczy ekran.
-- `viewer.606ceb00e1e1.js` — własny WebGL2 renderer z animacją.
+- `viewer.62ca3dcbbe48.js` — własny WebGL2 renderer z animacją.
 - `scene-geometry.js` — wybór części racka bez starego pokoju i kabla z GLB.
 - `rooms.js`, `room-world.js` — wspólny rejestr, kamery i proceduralne wyspy z kablami.
 - `lab-renderer.js`, `lab-particles.js` — efekty w tym samym kontekście WebGL2.
